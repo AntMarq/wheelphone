@@ -1,5 +1,8 @@
 package com.example.wheellight;
 
+import com.example.wheellight.network.IWifiP2PListener;
+import com.example.wheellight.network.WiFiDirectBroadcastReceiver;
+
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.IntentFilter;
@@ -18,8 +21,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
-import com.example.wheellight.network.IWifiP2PListener;
-import com.example.wheellight.network.WiFiDirectBroadcastReceiver;
 
 public class Connectivity_Fragment extends Fragment implements IWifiP2PListener, PeerListListener{
 	
