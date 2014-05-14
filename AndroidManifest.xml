@@ -20,7 +20,9 @@
         android:theme="@style/AppTheme" android:name="WheelLightApp">
         <activity
             android:name="com.example.wheellight.MainActivity"
-            android:label="@string/app_name" >
+            android:label="@string/app_name" 
+            android:screenOrientation="landscape"  
+            >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
