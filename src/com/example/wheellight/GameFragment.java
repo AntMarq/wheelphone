@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.GridView;
 
 public class GameFragment extends Fragment{
 	
@@ -16,6 +17,9 @@ public class GameFragment extends Fragment{
 	{
 		View view = inflater.inflate(getResources().getLayout(R.layout.setting_fragment), container, false);
 		startGame = (Button)view.findViewById(R.id.startbutton);
+		// In your oncreate (or where ever you want to create your gridview)
+		GridView gridview = (GridView)view.findViewById(R.id.game_gridview);
+		
 		
 		startGame.setOnClickListener(new OnClickListener() {
 			
