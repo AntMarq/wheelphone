@@ -4,6 +4,9 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+import android.net.wifi.p2p.WifiP2pConfig;
+import android.net.wifi.p2p.WifiP2pDevice;
+import android.net.wifi.p2p.WifiP2pManager.ActionListener;
 import android.util.Log;
 
 public class ClientManager
@@ -53,8 +56,10 @@ public class ClientManager
 	{
 		try
 		{
-			serverSocket.close();
-			clientSocket.close();
+			if(clientSocket.isConnected())
+			{
+				clientSocket.close();
+			}
 			if(delegate != null)
 			{
 				delegate.onConnectionClosed();

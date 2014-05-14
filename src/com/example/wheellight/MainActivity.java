@@ -4,9 +4,11 @@ import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.IntentFilter;
+import android.net.wifi.p2p.WifiP2pConfig;
 import android.net.wifi.p2p.WifiP2pDevice;
 import android.net.wifi.p2p.WifiP2pDeviceList;
 import android.net.wifi.p2p.WifiP2pManager;
+import android.net.wifi.p2p.WifiP2pManager.ActionListener;
 import android.net.wifi.p2p.WifiP2pManager.Channel;
 import android.net.wifi.p2p.WifiP2pManager.PeerListListener;
 import android.os.Bundle;
@@ -24,6 +26,9 @@ public class MainActivity extends Activity implements IWifiP2PListener, PeerList
 	BroadcastReceiver mReceiver;
 	
 	IntentFilter mIntentFilter;
+	WifiP2pDeviceList peers;
+	
+	WifiP2pDevice connectingDevice;
 
 
 	@Override
@@ -77,13 +82,13 @@ public class MainActivity extends Activity implements IWifiP2PListener, PeerList
 		    @Override
 		    public void onSuccess()
 		    {
-		    	Toast.makeText(getApplicationContext(), "Found some peers", Toast.LENGTH_SHORT).show();
+		    	Toast.makeText(getApplicationContext(), "Discovered succeded", Toast.LENGTH_SHORT).show();
 		    }
 
 		    @Override
 		    public void onFailure(int reasonCode)
 		    {
-		    	Toast.makeText(getApplicationContext(), "didn't find any peers.", Toast.LENGTH_SHORT).show();
+		    	Toast.makeText(getApplicationContext(), "Discovered failed.", Toast.LENGTH_SHORT).show();
 		    }
 		});
 
@@ -98,10 +103,11 @@ public class MainActivity extends Activity implements IWifiP2PListener, PeerList
 	@Override
 	public void onPeersChanged()
 	{
-	    // request available peers from the wifi p2p manager. This is an
+		// request available peers from the wifi p2p manager. This is an
 	    // asynchronous call and the calling activity is notified with a
 	    // callback on PeerListListener.onPeersAvailable()
-	    if (mManager != null) {
+	    if (mManager != null)
+	    {
 	        mManager.requestPeers(mChannel, this);
 	    }
 	}
@@ -109,10 +115,38 @@ public class MainActivity extends Activity implements IWifiP2PListener, PeerList
 	@Override
 	public void onPeersAvailable(WifiP2pDeviceList _peers)
 	{
+		peers = _peers;
+		openConnectionWithDevice(peers.getDeviceList().iterator().next());
 		for(WifiP2pDevice device : _peers.getDeviceList())
 		{
 			Log.w("Main Activity", device.deviceName);
 		}
 	}
 
+	public void openConnectionWithDevice(final WifiP2pDevice _device)
+	{
+		if(connectingDevice == null || !_device.deviceName.equals(connectingDevice.deviceName))
+		{
+			connectingDevice = _device;
+			//obtain a peer from the WifiP2pDeviceList
+			WifiP2pConfig config = new WifiP2pConfig();
+			config.deviceAddress = _device.deviceAddress;
+			mManager.connect(mChannel, config, new ActionListener()
+			{
+	
+			    @Override
+			    public void onSuccess()
+			    {
+			    	
+			        Toast.makeText(getApplicationContext(), "Connection succeded", Toast.LENGTH_SHORT).show();
+			    }
+	
+			    @Override
+			    public void onFailure(int reason)
+			    {
+			    	Toast.makeText(getApplicationContext(), "Connection failed", Toast.LENGTH_SHORT).show();
+			    }
+			});
+		}
+	}
 }
