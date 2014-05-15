@@ -9,17 +9,24 @@ import com.example.wheellight.network.ClientManager;
 import com.example.wheellight.network.IWifiP2PListener;
 import com.example.wheellight.network.WiFiDirectBroadcastReceiver;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnCancelListener;
 import android.content.IntentFilter;
 import android.net.wifi.p2p.WifiP2pConfig;
 import android.net.wifi.p2p.WifiP2pDevice;
 import android.net.wifi.p2p.WifiP2pDeviceList;
+import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.net.wifi.p2p.WifiP2pManager.ActionListener;
 import android.net.wifi.p2p.WifiP2pManager.Channel;
 import android.net.wifi.p2p.WifiP2pManager.PeerListListener;
 import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -46,6 +53,9 @@ public class Connectivity_Fragment extends Fragment implements IWifiP2PListener,
 	
 	ListView mListView;
 	WifiP2pDeviceList peers;
+	
+	ProgressDialog progressDialog;
+	boolean isWifiEnabled = false;
 	
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
 	{
@@ -94,75 +104,172 @@ public class Connectivity_Fragment extends Fragment implements IWifiP2PListener,
 	}
 
 	@Override
-	public void onPeersAvailable(WifiP2pDeviceList _peers)
+	public void onWifiP2PEnable()
 	{
-		Toast.makeText(getActivity(), "Found some peers.", Toast.LENGTH_SHORT).show();
-		peers = _peers;
-		((DeviceP2PAdapter)mListView.getAdapter()).setData(peers);
+		isWifiEnabled = true;
+		if(peers == null || peers.getDeviceList().size() == 0)
+		{
+			if(progressDialog != null)
+				progressDialog.dismiss();
+			
+			progressDialog = ProgressDialog.show(getActivity(), "Please wait", "Searching for local peers...", true);
+			progressDialog.setCancelable(true);
+			progressDialog.setOnCancelListener(new OnCancelListener()
+			{
+				@Override
+				public void onCancel(DialogInterface _dialog)
+				{
+					_dialog.dismiss();
+					if(dialogCount == 0)
+						getFragmentManager().popBackStackImmediate();
+				}
+			});
+			
+			mManager.discoverPeers(mChannel, new WifiP2pManager.ActionListener()
+			{
+			    @Override
+			    public void onSuccess()
+			    {
+			    }
+
+			    @Override
+			    public void onFailure(int reasonCode)
+			    {
+			    	progressDialog.dismiss();
+			    	showDialog("Connection error" , "Failed to discover local peers." , true, true);
+			    }
+			});
+		}
+		else
+		{
+			onPeersAvailable(peers);
+		}
 	}
 
 	@Override
-	public void onWifiP2PEnable() {
-		Toast.makeText(context, "Wifi P2P ON", Toast.LENGTH_SHORT).show();
-		
-		mManager.discoverPeers(mChannel, new WifiP2pManager.ActionListener() {
-		    @Override
-		    public void onSuccess()
-		    {
-		    	Toast.makeText(context, "Discovered succeded", Toast.LENGTH_SHORT).show();
-		    }
+	public void onWifiP2PDisable()
+	{
+		isWifiEnabled = false;
 
-		    @Override
-		    public void onFailure(int reasonCode)
-		    {
-		    	Toast.makeText(context, "Discovered failed.", Toast.LENGTH_SHORT).show();
-		    }
-		});
-		
-	}
-
-	@Override
-	public void onWifiP2PDisable() {
-		Toast.makeText(context, "Wifi P2P OFF", Toast.LENGTH_SHORT).show();
-		
+		if(peers == null)
+		{
+			if(progressDialog != null)
+				progressDialog.dismiss();
+			
+			progressDialog = ProgressDialog.show(getActivity(), "Wifi Direct is Disabled", "Please enable your Wifi Direct...", true);
+			progressDialog.setCancelable(true);
+			progressDialog.setOnCancelListener(new OnCancelListener()
+			{
+				@Override
+				public void onCancel(DialogInterface _dialog)
+				{
+					_dialog.dismiss();
+					if(dialogCount == 0)
+						getFragmentManager().popBackStackImmediate();
+				}
+			});
+		}
 	}
 
 	@Override
 	public void onPeersChanged()
 	{
-		 if (mManager != null)
+		if(connectingDevice == null)
+		{
+			if (mManager != null)
 		    {
 		        mManager.requestPeers(mChannel, this);
 		    }
+		}
+	}
+	
+	@Override
+	public void onPeersAvailable(WifiP2pDeviceList _peers)
+	{	
+		if(connectingDevice == null)
+		{
+			peers = _peers;
+	
+			if(progressDialog != null)
+				progressDialog.dismiss();
+			
+			((DeviceP2PAdapter)mListView.getAdapter()).setData(peers);
+		}
 	}
 	
 	public void openConnectionWithDevice(final WifiP2pDevice _device)
 	{
-		if(connectingDevice == null || !_device.deviceName.equals(connectingDevice.deviceName))
+		connectingDevice = _device;
+		//obtain a peer from the WifiP2pDeviceList
+		WifiP2pConfig config = new WifiP2pConfig();
+		config.deviceAddress = _device.deviceAddress;
+		
+		
+		if(progressDialog != null)
+			progressDialog.dismiss();
+		
+		progressDialog = ProgressDialog.show(getActivity(), "Please wait", "Waiting for target response.", true);
+		progressDialog.setCancelable(true);
+		progressDialog.setOnCancelListener(new OnCancelListener()
 		{
-			connectingDevice = _device;
-			//obtain a peer from the WifiP2pDeviceList
-			WifiP2pConfig config = new WifiP2pConfig();
-			config.deviceAddress = _device.deviceAddress;
-			mManager.connect(mChannel, config, new ActionListener()
+			@Override
+			public void onCancel(DialogInterface _dialog)
 			{
-	
-			    @Override
-			    public void onSuccess()
-			    {
-			        Toast.makeText(context, "Connection succeded", Toast.LENGTH_SHORT).show();
-			        ClientManager.getInstance().startListening();
-			        Toast.makeText(context, "Waiting for client to connect to socket.", Toast.LENGTH_SHORT).show();
-			    }
-	
-			    @Override
-			    public void onFailure(int reason)
-			    {
-			    	Toast.makeText(context, "Connection failed", Toast.LENGTH_SHORT).show();
-			    }
-			});
+				_dialog.dismiss();
+				if(dialogCount == 0)
+					getFragmentManager().popBackStackImmediate();
+			}
+		});
+		
+		
+		mManager.connect(mChannel, config, new ActionListener()
+		{
+
+		    @Override
+		    public void onSuccess()
+		    {
+		    }
+
+		    @Override
+		    public void onFailure(int reason)
+		    {
+		    }
+		});
+	}
+
+	@Override
+	public void onConnectionOn(WifiP2pInfo _info)
+	{
+		if(progressDialog != null)
+			progressDialog.dismiss();
+		
+		ClientManager.getInstance().startListening();
+		progressDialog = ProgressDialog.show(getActivity(), "Server", "Socket opened, waiting for TCP connection.", true);
+		progressDialog.setCancelable(true);
+		progressDialog.setOnCancelListener(new OnCancelListener()
+		{
+			@Override
+			public void onCancel(DialogInterface _dialog)
+			{
+				_dialog.dismiss();
+				if(dialogCount == 0)
+					getFragmentManager().popBackStackImmediate();
+			}
+		});
+	}
+
+	@Override
+	public void onConnectionOff(WifiP2pInfo _info)
+	{
+		if(connectingDevice != null)
+		{
+			if(progressDialog != null)
+				progressDialog.dismiss();
+			
+			showDialog("Connection lost" , "The connection with the other device has been lost." , true , true);
 		}
 	}
+	
 	/* register the broadcast receiver with the intent values to be matched */
 	@Override
 	public void onResume()
@@ -227,6 +334,73 @@ public class Connectivity_Fragment extends Fragment implements IWifiP2PListener,
 			((TextView)_convertView).setText(data.get(_position));
 			return _convertView;
 		}
-
 	}
+	
+	static int dialogCount = 0;
+	
+	public void showDialog(String _title, String _message, boolean canRetry, boolean shouldLeave)
+	{
+		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+		builder.setTitle(_title);
+		builder.setMessage(_message);
+		builder.setCancelable(true);
+		
+		if(shouldLeave)
+		{
+			builder.setOnCancelListener(new OnCancelListener()
+			{
+				
+				@Override
+				public void onCancel(DialogInterface _dialog)
+				{
+					_dialog.cancel();
+					dialogCount--;
+					if(!progressDialog.isShowing() && dialogCount == 0)
+						getFragmentManager().popBackStackImmediate();
+				}
+			});
+		}
+		else
+		{
+			builder.setOnCancelListener(new OnCancelListener()
+			{
+				
+				@Override
+				public void onCancel(DialogInterface _dialog)
+				{
+					_dialog.cancel();
+					dialogCount--;
+				}
+			});
+		}
+		
+		if(canRetry)
+		{
+			builder.setPositiveButton(R.string.retry, new DialogInterface.OnClickListener()
+			{
+				@Override
+				public void onClick(DialogInterface dialog, int id)
+				{
+					dialogCount--;
+					dialog.dismiss();
+					peers = null;
+					connectingDevice = null;
+					((BaseAdapter)mListView.getAdapter()).notifyDataSetChanged();
+					if(isWifiEnabled)
+						onWifiP2PEnable();
+					else
+						onWifiP2PDisable();
+				}
+			});
+		}
+		
+		dialogCount++;
+		builder.show();
+	}
+	
+	void onBackPressed()
+	{
+		
+	}
+
 }
