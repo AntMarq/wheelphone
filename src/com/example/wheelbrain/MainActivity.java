@@ -11,7 +11,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Menu;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -32,9 +33,11 @@ public class MainActivity extends Activity implements WheelPhoneRobotListener
 	
 	//UI
 	private TextView connectionState;
+	private Button moveStateSwitch;
 	
 	//move 
 	private boolean isConnect = false;
+	private boolean isMoving  = false;
 	private int moveTimeCounter = 0;
 	
 	@Override
@@ -46,12 +49,31 @@ public class MainActivity extends Activity implements WheelPhoneRobotListener
 		context = this.getApplicationContext();
 		
 		connectionState = (TextView)findViewById(R.id.connectionState);
+		moveStateSwitch = (Button)findViewById(R.id.moveStateSwitch);
 		
         wheelphone = new WheelphoneRobot(getApplicationContext(), getIntent());
         wheelphone.enableSpeedControl();
         wheelphone.enableSoftAcceleration();
         //wheelphone.enableObstacleAvoidance();
         //wheelphone.enableCliffAvoidance();
+        
+        //set click listener
+        moveStateSwitch.setOnClickListener(new View.OnClickListener() {
+        	public void onClick(View arg0) {
+        		if(isConnect && !isMoving) {
+            		isMoving = true;
+            		moveStateSwitch.setText("Stop");
+            		
+            		wheelphone.setRawSpeed(-120, 120);
+            	} else {
+            		isMoving = false;
+            		moveStateSwitch.setText("Start");
+            		
+            		wheelphone.setRawSpeed(0, 0);
+            	}
+        	}
+        });
+        
 	}
 
 	@Override
@@ -98,7 +120,23 @@ public class MainActivity extends Activity implements WheelPhoneRobotListener
     	wheelphone.closeUSBCommunication();
     	wheelphone.setWheelPhoneRobotListener(null);
     }
-	
+	/*
+    //onClick methods
+    public void startAndStopMoving(View view) {
+    	if(!isMoving) {
+    		isMoving = true;
+    		//moveStateSwitch.setText("Stop");
+    		
+    		//wheelphone.setRawSpeed(-60, 60);
+    	} else {
+    		isMoving = false;
+    		//moveStateSwitch.setText("Start");
+    		
+    		
+    		//wheelphone.setRawSpeed(0, 0);
+    	}
+    }
+    */
 	@Override
 	public void onWheelphoneUpdate() {
 		Log.v(TAG, "onWheelphoneUpdate");
@@ -119,18 +157,19 @@ public class MainActivity extends Activity implements WheelPhoneRobotListener
 			connectionState.setText("Connected");
 			connectionState.setTextColor(getResources().getColor(R.color.green));
 			isConnect = true;
-			wheelphone.setRawSpeed(-60, 60);
 		} else {
 			connectionState.setText("Disconnected");
 			connectionState.setTextColor(getResources().getColor(R.color.red));
 			isConnect = false;
 		}
 		
-		moveTimeCounter++;
-		
-		if(moveTimeCounter == 20) {
+		/*
+		if(isConnect && isMoving) {
+			wheelphone.setRawSpeed(-60, 60);
+		} else {
 			wheelphone.setRawSpeed(0, 0);
 		}
+		*/
 	}
 	
 	public void msgbox(String title,String msg) {
