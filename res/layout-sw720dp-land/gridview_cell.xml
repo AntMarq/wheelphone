@@ -1,6 +1,8 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" >
+    android:layout_height="match_parent"
+   
+     >
 
     <TextView
         android:id="@+id/title"
@@ -18,12 +20,12 @@
     android:layout_below="@+id/title"
     android:layout_marginBottom="5dp"
     android:columnWidth="40dp"
+    android:descendantFocusability="blocksDescendants"
     android:gravity="center_horizontal"
     android:horizontalSpacing="0dp"
     android:numColumns="5"
     android:stretchMode="none"
-    android:verticalSpacing="0dp"
-     >
+    android:verticalSpacing="0dp" >
 
  </GridView>
  

@@ -1,31 +1,39 @@
 package com.example.adapter;
 
 
+import java.util.ArrayList;
+
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.example.wheellight.GameMap;
 import com.example.wheellight.R;
 
 public class ChooseGridViewAdapter extends BaseAdapter {
 
 	private Context mContext;
 	private LayoutInflater inflater;
+	private ArrayList<GameMap> listMap;
 	
-	public ChooseGridViewAdapter(Context c){
+	public ChooseGridViewAdapter(Context c, ArrayList<GameMap> _listMap){
 	    mContext = c;
 	    inflater = LayoutInflater.from(c);
+	    listMap = _listMap;
 	}
 	
 	@Override
 	public int getCount() {
 		// TODO Auto-generated method stub
-		return 9;
+		return listMap.size();
 	}
 
 	@Override
@@ -41,25 +49,32 @@ public class ChooseGridViewAdapter extends BaseAdapter {
 	}
 
 	@Override
-	public View getView(int position, View convertView, ViewGroup parent) {
+	public View getView(final int position, View convertView, ViewGroup parent) {
 		
 		
 		ViewHolder holder;
+		GameMap objData = ((GameMap)(listMap.get (position)));
+		
+		
         if (convertView == null) {  // if it's not recycled, initialize some attributes
         	
         	 holder = new ViewHolder();	 
         	 convertView = inflater.inflate(R.layout.gridview_cell, null);
+        	 convertView.setClickable(false);
+             convertView.setFocusable(false);
         	 holder.title = (TextView) convertView.findViewById(R.id.title);
         	 holder.gridView = (GridView) convertView.findViewById(R.id.cell_gridview);
-        	 holder.gridView.setAdapter(new MapGridViewAdapter(mContext, 40));
-        //	 holder.gridView.setLayoutParams(new GridView.LayoutParams(250, 250));  
+        
+        	 holder.gridView.setAdapter(new MapGridViewAdapter(mContext,40, objData));
+        	
         	 convertView.setTag(holder);
            
         } else {
         	holder = (ViewHolder) convertView.getTag();
         }
-        holder.title.setText("Map number X");
-      
+        holder.title.setText(objData.getName());
+        
+        
         return convertView;
 	}
 	
@@ -68,5 +83,7 @@ public class ChooseGridViewAdapter extends BaseAdapter {
            TextView title;
            GridView gridView ;	         
     }
+	
+	
 
 }
