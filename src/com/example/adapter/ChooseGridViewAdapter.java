@@ -13,6 +13,7 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.wheellight.GameMap;
@@ -60,18 +61,16 @@ public class ChooseGridViewAdapter extends BaseAdapter {
         	
         	 holder = new ViewHolder();	 
         	 convertView = inflater.inflate(R.layout.gridview_cell, null);
-        	 convertView.setClickable(false);
-             convertView.setFocusable(false);
         	 holder.title = (TextView) convertView.findViewById(R.id.title);
-        	 holder.gridView = (GridView) convertView.findViewById(R.id.cell_gridview);
-        
-        	 holder.gridView.setAdapter(new MapGridViewAdapter(mContext,40, objData));
-        	
+        	 holder.imageView = (ImageView) convertView.findViewById(R.id.imageView1);
+        	// holder.imageView.setAdapter(new MapGridViewAdapter(mContext,40, objData));
+        	 holder.imageView.setImageBitmap(objData.getImage());
         	 convertView.setTag(holder);
            
         } else {
         	holder = (ViewHolder) convertView.getTag();
         }
+       
         holder.title.setText(objData.getName());
         
         
@@ -81,7 +80,7 @@ public class ChooseGridViewAdapter extends BaseAdapter {
 	private class ViewHolder 
     {
            TextView title;
-           GridView gridView ;	         
+           ImageView imageView ;	         
     }
 	
 	

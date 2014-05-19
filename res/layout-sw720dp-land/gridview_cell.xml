@@ -1,33 +1,27 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
    
      >
 
-    <TextView
+       <TextView
         android:id="@+id/title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="TextView" 
-        android:layout_marginBottom="20dp"
-        android:layout_marginTop="20dp"
-        android:textSize="24dp"/>
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:text="TextView"
+        android:textSize="24dp" />
+       
+    <ImageView
+        android:id="@+id/imageView1"
+        android:layout_width="350dp"
+        android:layout_height="250dp"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@id/title"
+        android:adjustViewBounds="true"
+        android:src="@drawable/ic_launcher" />
 
-<GridView
-    android:id="@+id/cell_gridview"
-    android:layout_width="250dp"
-    android:layout_height="250dp"
-    android:layout_below="@+id/title"
-    android:layout_marginBottom="5dp"
-    android:columnWidth="40dp"
-    android:descendantFocusability="blocksDescendants"
-    android:gravity="center_horizontal"
-    android:horizontalSpacing="0dp"
-    android:numColumns="5"
-    android:stretchMode="none"
-    android:verticalSpacing="0dp" >
-
- </GridView>
  
     
 </RelativeLayout>

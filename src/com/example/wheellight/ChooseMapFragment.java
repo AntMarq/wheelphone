@@ -2,9 +2,11 @@ package com.example.wheellight;
 
 import java.util.ArrayList;
 
+import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,6 +25,8 @@ public class ChooseMapFragment extends Fragment{
 	private Editor toEdit;
 	private static String tag = "ChooseMapFragment";
 	GridView gridview;
+	private SharedPreferences sh_Pref;
+
 	
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
 	{
@@ -39,8 +43,14 @@ public class ChooseMapFragment extends Fragment{
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view,int position, long id) {
 				// TODO Auto-generated method stub
-			//	sharedPreferences(position + 1);
 				Log.v(tag, "onItemClick = " + position);
+				sh_Pref = getActivity().getSharedPreferences("WheelLight", 0);		
+				toEdit = sh_Pref.edit();
+				sharedPreferences(listMap.get(position).getIdmap());
+				
+				FragmentManager fm = getFragmentManager();
+				fm.popBackStackImmediate();
+				
 			}
 		});
 		

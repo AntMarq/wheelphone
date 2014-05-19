@@ -1,27 +1,10 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
 
-    <item
-        android:id="@+id/left"
-        android:orderInCategory="2"
-        android:icon="@drawable/arrow_left"
-        android:showAsAction="ifRoom"
-        android:title="@string/left"
-       />
-    
-    <item
-        android:id="@+id/up"
-        android:orderInCategory="3"
-        android:icon="@drawable/arrow_up"
-        android:showAsAction="ifRoom"
-        android:title="@string/up"
-        />
-    
-    <item
-        android:id="@+id/right"
-        android:orderInCategory="4"
-        android:showAsAction="ifRoom"
-        android:icon="@drawable/arrow_right"
-        android:title="@string/right"/>
 
-
+	<item
+        android:id="@+id/savemap"
+        android:orderInCategory="5"
+        android:showAsAction="ifRoom"
+        android:icon="@drawable/ic_action_save"
+        android:title="@string/savemap"/>
 </menu>

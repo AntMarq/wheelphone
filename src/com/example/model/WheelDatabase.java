@@ -3,13 +3,16 @@ package com.example.model;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Bitmap;
 import android.util.Log;
 
 import com.example.wheellight.GameMap;
 import com.example.wheellight.TypeOfCell;
+import com.example.wheellight.Utility;
 
 
 
@@ -51,9 +54,9 @@ public class WheelDatabase
 	{
 		SQLiteDatabase db = helper.getReadableDatabase();
 		ArrayList<GameMap> mapList = new ArrayList<GameMap>();
-		ArrayList<TypeOfCell> mapStructure = new ArrayList<TypeOfCell>();
-		String title = null;
-		GameMap map = new GameMap(mapStructure, title);
+		
+	
+		
 		 // Select All Query
 	    String selectQuery =  "SELECT * FROM map ";	
 	    Cursor cursor = db.rawQuery(selectQuery, null);
@@ -61,39 +64,40 @@ public class WheelDatabase
 	    // looping through all rows and adding to list
 	    if(cursor.getCount () !=0)
 	    {
-		    if (cursor.moveToFirst()) {
+		    if (cursor.moveToFirst()) 
+		    {
 		        do {
-
-		        	title = cursor.getString(cursor.getColumnIndex("title"));
+		        	ArrayList<TypeOfCell> mapStructure = new ArrayList<TypeOfCell>();
+		        	int idmap = cursor.getInt(cursor.getColumnIndex("_id"));
+		        	
+		        	String title = cursor.getString(cursor.getColumnIndex("title"));
+		        	byte [] image = cursor.getBlob(cursor.getColumnIndex("image"));
 		        	String structure = cursor.getString(cursor.getColumnIndex("structure"));
 		        	String [] separated = structure.split(",");	
 		        	
 		        	for (String item : separated)
-		     	    {	 	     	
+		     	    {	 	     			        		
 		        		TypeOfCell color = TypeOfCell.valueOf(item);
-		        		//ArrayList Enum
-		        		mapStructure.add(color);
-		        		Log.v("WheelDatabase", "structure_map.size() = " + mapStructure.size());		        		
-
+		        		mapStructure.add(color);	        		
 		     	    }
 		        	
-		        	map.setMapStructure(mapStructure);
-		        	map.setName(title);
+		        	GameMap map = new GameMap(idmap,mapStructure,title);
+		        	if(image != null)
+		        	{
+		        		map.setImage(Utility.getPhoto(image));
+		        	}
 		        	mapList.add(map);
 		        }
 		        while (cursor.moveToNext());
 		    }
 		    
 	    }
-	    Log.v("WheelDatabase", "mapList.size() = " + mapList.size());
 		return mapList;	
 	}
 
 	public GameMap getSelectMap(int idMapSelect) {
 		
-		ArrayList<TypeOfCell> mapStructure = new ArrayList<TypeOfCell>();
-		String title = null;
-		GameMap mapGame = new GameMap(mapStructure, title);
+		GameMap mapGame = null;
 		SQLiteDatabase db = helper.getReadableDatabase();
 		String selectQuery =  "SELECT * FROM map WHERE _id =" + idMapSelect;	
 	    Cursor cursor = db.rawQuery(selectQuery, null);
@@ -101,7 +105,9 @@ public class WheelDatabase
 	    {
 		    if (cursor.moveToFirst()) {
 		        do {
-		        	title = cursor.getString(cursor.getColumnIndex("title"));
+		    		ArrayList<TypeOfCell> mapStructure = new ArrayList<TypeOfCell>();
+		        	int idmap = cursor.getInt(cursor.getColumnIndex("_id"));
+		        	String title = cursor.getString(cursor.getColumnIndex("title"));
 		        	String structure = cursor.getString(cursor.getColumnIndex("structure"));
 		        	String [] separated = structure.split(",");	
 		        	
@@ -111,9 +117,8 @@ public class WheelDatabase
 		        		//ArrayList Enum
 		        		mapStructure.add(color);	        		
 		     	    }
+		        	mapGame = new GameMap(idmap,mapStructure, title);
 		        	
-		        	mapGame.setMapStructure(mapStructure);
-		        	mapGame.setName(title);
 		       
 		        }
 		        while (cursor.moveToNext());
@@ -121,6 +126,17 @@ public class WheelDatabase
 	    }
 		
 		return mapGame;
+	}
+	
+	public void saveImageinDB(GameMap map, byte[] photo)
+	{
+		SQLiteDatabase db = helper.getWritableDatabase();
+		ContentValues values = new ContentValues();
+		//remove [ ] && space
+    	String cleanStructure = map.getMapStructure().toString().replaceAll("\\[", "").replaceAll("\\]","").replaceAll(" ", "");
+		values.put("structure", cleanStructure);
+        values.put("image",photo);     
+        db.update("map", values, "_id =" + map.getIdmap(), null); 
 	}
 
 }

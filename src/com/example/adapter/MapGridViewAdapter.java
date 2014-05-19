@@ -10,6 +10,7 @@ import android.widget.GridView;
 import android.widget.ImageView;
 
 import com.example.wheellight.GameMap;
+import com.example.wheellight.R;
 import com.example.wheellight.TypeOfCell;
 
 public class MapGridViewAdapter extends BaseAdapter{
@@ -74,10 +75,10 @@ public class MapGridViewAdapter extends BaseAdapter{
 			 imageView.setBackgroundColor(Color.BLUE);
 			 break;
 		 case Start:
-			// imageView.setBackgroundResource(R.drawable.ic);
+			 imageView.setBackgroundResource(R.drawable.search);
 			 break;
 		 case End:
-			 imageView.setBackgroundColor(Color.CYAN);
+			 imageView.setBackgroundResource(R.drawable.finish_flag);
 			 break;
 		 case Yellow:
 			 imageView.setBackgroundColor(Color.YELLOW);

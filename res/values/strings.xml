@@ -10,5 +10,11 @@
     <string name="up">Up</string>
     <string name="left">Left</string>
     <string name="right">Right</string>
+    <string name="savemap">Save</string>
+    
+    <string name="obstacle">Case Obstacle</string>
+    <string name="neutre">Case Neutre</string>
+    
+    
 	
 </resources>
