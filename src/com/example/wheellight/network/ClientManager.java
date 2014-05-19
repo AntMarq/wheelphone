@@ -1,12 +1,16 @@
 package com.example.wheellight.network;
 
+import instructions.Instruction;
+
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 
-import android.net.wifi.p2p.WifiP2pConfig;
-import android.net.wifi.p2p.WifiP2pDevice;
-import android.net.wifi.p2p.WifiP2pManager.ActionListener;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import android.util.Log;
 
 public class ClientManager
@@ -89,5 +93,25 @@ public class ClientManager
 	public ServerSocket getServer()
 	{
 		return serverSocket;
+	}
+	
+	public void sendInstructions(ArrayList<Instruction> _instrus)
+	{
+		JSONArray json = new JSONArray();
+		for(Instruction inst : _instrus)
+		{
+			try
+			{
+				JSONObject obj = new JSONObject();
+				obj.put("type", inst.type.toString());
+				json.put(obj);
+			} catch (JSONException e)
+			{
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		SocketOutputThread output = new SocketOutputThread(clientSocket, json);
+		output.start();
 	}
 }
