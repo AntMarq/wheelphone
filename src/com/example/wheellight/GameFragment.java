@@ -1,6 +1,7 @@
 package com.example.wheellight;
 
 import instructions.Instruction;
+import instructions.Instruction.EInstructionType;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -227,12 +228,20 @@ public class GameFragment extends Fragment{
 			@Override
 			public void onClick(View v) {
 				moveArray = new ArrayList<Instruction>();
-				move
-				
-				
+				moveArray.add(new Instruction(EInstructionType.Start));
+				moveArray.add(new Instruction(EInstructionType.Forward));
+				moveArray.add(new Instruction(EInstructionType.Forward));
+				moveArray.add(new Instruction(EInstructionType.Left));
+				moveArray.add(new Instruction(EInstructionType.Forward));
+				moveArray.add(new Instruction(EInstructionType.Forward));
+				moveArray.add(new Instruction(EInstructionType.Right));
+				moveArray.add(new Instruction(EInstructionType.Forward));
+				moveArray.add(new Instruction(EInstructionType.Win));
+
 				Connectivity_Fragment gameFragment = new Connectivity_Fragment();  
 				Bundle bdl = new Bundle();
-				bdl.putStringArrayList("blue", moveArray);		
+				bdl.putSerializable("instruction", moveArray);
+					
 		        getFragmentManager().beginTransaction()
 		                .replace(R.id.mainfragment, gameFragment)
 		                .addToBackStack(null)
