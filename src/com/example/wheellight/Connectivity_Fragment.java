@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.example.wheellight.network.ClientManager;
+import com.example.wheellight.network.IClientManagerListener;
 import com.example.wheellight.network.IWifiP2PListener;
 import com.example.wheellight.network.WiFiDirectBroadcastReceiver;
 
@@ -41,7 +42,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 
-public class Connectivity_Fragment extends Fragment implements IWifiP2PListener, PeerListListener{
+public class Connectivity_Fragment extends Fragment implements IWifiP2PListener, PeerListListener, IClientManagerListener
+{
 	
 	WifiP2pManager mManager;
 	Channel mChannel;
@@ -56,6 +58,7 @@ public class Connectivity_Fragment extends Fragment implements IWifiP2PListener,
 	
 	ProgressDialog progressDialog;
 	boolean isWifiEnabled = false;
+	boolean isWifiPaired = false;
 	
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
 	{
@@ -238,13 +241,14 @@ public class Connectivity_Fragment extends Fragment implements IWifiP2PListener,
 	}
 
 	@Override
-	public void onConnectionOn(WifiP2pInfo _info)
+	public void onWifiTunnelMade(WifiP2pInfo _info)
 	{
+		isWifiPaired = true;
 		if(progressDialog != null)
 			progressDialog.dismiss();
 		
-		ClientManager.getInstance().startListening();
-		progressDialog = ProgressDialog.show(getActivity(), "Server", "Socket opened, waiting for TCP connection.", true);
+		ClientManager.getInstance().startListening(this);
+		progressDialog = ProgressDialog.show(getActivity(), "Server", "Server socket awaiting connection.", true);
 		progressDialog.setCancelable(true);
 		progressDialog.setOnCancelListener(new OnCancelListener()
 		{
@@ -259,10 +263,11 @@ public class Connectivity_Fragment extends Fragment implements IWifiP2PListener,
 	}
 
 	@Override
-	public void onConnectionOff(WifiP2pInfo _info)
+	public void onWifiTunnelLost(WifiP2pInfo _info)
 	{
-		if(connectingDevice != null)
+		if(isWifiPaired && connectingDevice != null)
 		{
+			isWifiPaired = false;
 			if(progressDialog != null)
 				progressDialog.dismiss();
 			
@@ -283,6 +288,13 @@ public class Connectivity_Fragment extends Fragment implements IWifiP2PListener,
 	{
 	    super.onPause();
 	    getActivity().unregisterReceiver(mReceiver);
+	}
+	
+	@Override
+	public void onDestroy()
+	{
+		super.onDestroy();
+		ClientManager.getInstance().closeConnection();
 	}
 
 	private class DeviceP2PAdapter extends BaseAdapter
@@ -401,6 +413,31 @@ public class Connectivity_Fragment extends Fragment implements IWifiP2PListener,
 	void onBackPressed()
 	{
 		
+	}
+
+	@Override
+	public void onSocketOpen()
+	{
+		if(progressDialog!=null)
+			progressDialog.dismiss();
+		
+		progressDialog = ProgressDialog.show(getActivity(), "Socket", "Socket is opened. Feel free to transfer data.", true);
+		progressDialog.setCancelable(true);
+		progressDialog.setOnCancelListener(new OnCancelListener()
+		{
+			@Override
+			public void onCancel(DialogInterface _dialog)
+			{
+				_dialog.dismiss();
+				if(dialogCount == 0)
+					getFragmentManager().popBackStackImmediate();
+			}
+		});
+	}
+
+	@Override
+	public void onSocketClose()
+	{
 	}
 
 }

@@ -6,9 +6,11 @@ import java.net.Socket;
 import android.os.AsyncTask;
 import android.util.Log;
 
-public class ServerListeningConnectionTask extends AsyncTask<Void, Void, Void>
+public class ServerConnectionTask extends AsyncTask<Void, Void, Void>
 {
-    public ServerListeningConnectionTask()
+	boolean success = false;
+	Socket client;
+    public ServerConnectionTask()
     {
     }
 
@@ -21,12 +23,12 @@ public class ServerListeningConnectionTask extends AsyncTask<Void, Void, Void>
              * Create a server socket and wait for client connections. This
              * call blocks until a connection is accepted from a client
              */
-        	Socket client = ClientManager.getInstance().getServer().accept();
-            ClientManager.getInstance().setClient(client);
+        	client = ClientManager.getInstance().getServer().accept();
+        	success = true;
         }
         catch (IOException e)
         {
-            Log.e("ServerListeningTask", e.getMessage());
+            Log.e("ServerConnectionTask", e.getMessage());
         }
         return null;
     }
@@ -35,6 +37,7 @@ public class ServerListeningConnectionTask extends AsyncTask<Void, Void, Void>
     @Override
     protected void onPostExecute(Void arg)
     {
-    	
+    	if(success)
+            ClientManager.getInstance().setClient(client);
     }
 }

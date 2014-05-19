@@ -8,6 +8,6 @@ public interface IWifiP2PListener
 	public void onWifiP2PDisable();
 	
 	public void onPeersChanged();
-	public void onConnectionOn(WifiP2pInfo _info);
-	public void onConnectionOff(WifiP2pInfo _info);
+	public void onWifiTunnelMade(WifiP2pInfo _info);
+	public void onWifiTunnelLost(WifiP2pInfo _info);
 }

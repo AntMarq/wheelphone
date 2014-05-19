@@ -46,9 +46,9 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver
         {
         	WifiP2pInfo info = (WifiP2pInfo) intent.getExtras().get(WifiP2pManager.EXTRA_WIFI_P2P_INFO);
         	if(info.groupFormed)
-        		delegate.onConnectionOn(info);
+        		delegate.onWifiTunnelMade(info);
         	else
-        		delegate.onConnectionOff(info);
+        		delegate.onWifiTunnelLost(info);
             // Respond to new connection or disconnections
         }
         else if (WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION.equals(action))

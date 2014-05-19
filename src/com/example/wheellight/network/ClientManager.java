@@ -13,7 +13,7 @@ public class ClientManager
 {
 	Socket clientSocket;
 	ServerSocket serverSocket;
-	ServerListeningConnectionTask serverTask;
+	ServerConnectionTask serverTask;
 	IClientManagerListener delegate;
 	
 	
@@ -21,7 +21,7 @@ public class ClientManager
 	{
 		try
 		{
-			serverSocket = new ServerSocket(8888);
+			serverSocket = new ServerSocket(8765);
 		} 
 		catch (IOException e)
 		{
@@ -39,11 +39,12 @@ public class ClientManager
 		return Holder.sInstance;
 	}
 	
-	public void startListening()
+	public void startListening(IClientManagerListener _delegate)
 	{
+		delegate = _delegate;
 		if(serverTask == null)
 		{
-			serverTask = new ServerListeningConnectionTask();
+			serverTask = new ServerConnectionTask();
 			serverTask.execute();
 		}
 		else
@@ -62,7 +63,7 @@ public class ClientManager
 			}
 			if(delegate != null)
 			{
-				delegate.onConnectionClosed();
+				delegate.onSocketClose();
 			}
 		}
 		catch (IOException e)
@@ -76,7 +77,7 @@ public class ClientManager
 		clientSocket = client;
 		if(delegate != null)
 		{
-			delegate.onConnectionOpened();
+			delegate.onSocketOpen();
 		}
 	}
 	
@@ -88,10 +89,5 @@ public class ClientManager
 	public ServerSocket getServer()
 	{
 		return serverSocket;
-	}
-	
-	public void setDelegate(IClientManagerListener _delegate)
-	{
-		delegate = _delegate;
 	}
 }
