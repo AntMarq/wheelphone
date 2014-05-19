@@ -17,6 +17,11 @@ public class Instruction
 	
 	public EInstructionType type;
 	
+	public Instruction()
+	{
+		
+	}
+	
 	public Instruction(EInstructionType _type)
 	{
 		type = _type;
