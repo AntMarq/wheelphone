@@ -3,22 +3,20 @@
     android:id="@+id/RelativeLayout1"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_marginLeft="50dp"
+
      >
 
     <GridView
         android:id="@+id/choose_gridview"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"     
-        android:layout_centerInParent="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
         android:columnWidth="50dp"
-        android:gravity="center_vertical|center_horizontal|center"
         android:horizontalSpacing="2dp"
         android:numColumns="3"
         android:stretchMode="columnWidth"
-        android:verticalSpacing="10dp"
-       >
-
+        android:verticalSpacing="10dp" >
     </GridView>
 
 </RelativeLayout>

@@ -1,5 +1,6 @@
 package com.example.adapter;
 
+
 import android.content.Context;
 import android.graphics.Color;
 import android.view.View;
@@ -8,15 +9,20 @@ import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
 
+import com.example.enumClass.TypeOfCell;
+import com.example.model.GameMap;
+import com.example.wheellight.R;
+
 public class MapGridViewAdapter extends BaseAdapter{
 
 	private Context mContext;
-	private int r,g,b;
 	private int size;
+	private GameMap mapData;
 	
-	public MapGridViewAdapter(Context c, int _size){
+	public MapGridViewAdapter(Context c, int _size, GameMap _mapData){
 	    mContext = c;
 	    size = _size;
+	    mapData = _mapData;
 	}
 	
 	@Override
@@ -40,11 +46,9 @@ public class MapGridViewAdapter extends BaseAdapter{
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
 		
-		ImageView imageView;
-		r= (int) (Math.random()*255);
-		g=(int) (Math.random()*255);
-		b=(int) (Math.random()*255);
-		
+		ImageView imageView;	
+		TypeOfCell enumColor = mapData.getMapStructure().get(position);
+
         if (convertView == null) {  // if it's not recycled, initialize some attributes
             imageView = new ImageView(mContext);
             imageView.setLayoutParams(new GridView.LayoutParams(size, size));
@@ -56,7 +60,35 @@ public class MapGridViewAdapter extends BaseAdapter{
             imageView = (ImageView) convertView;
         }
 
-        imageView.setBackgroundColor(Color.rgb(r, g, b));
+        switch(enumColor)
+		{
+		 case None:
+			 imageView.setBackgroundColor(Color.GRAY); 		 
+			 break;
+		 case Green:
+			 imageView.setBackgroundColor(Color.GREEN);
+			 break;
+		 case Black:
+			 imageView.setBackgroundColor(Color.BLACK);
+			 break;
+		 case Blue:
+			 imageView.setBackgroundColor(Color.BLUE);
+			 break;
+		 case Start:
+			 imageView.setBackgroundResource(R.drawable.search);
+			 break;
+		 case End:
+			 imageView.setBackgroundResource(R.drawable.finish_flag);
+			 break;
+		 case Yellow:
+			 imageView.setBackgroundColor(Color.YELLOW);
+			 break;
+		 case Red:
+			 imageView.setBackgroundColor(Color.RED);
+			 break;
+			 
+		}
+    
         return imageView;
 
 	}

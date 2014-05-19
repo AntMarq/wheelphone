@@ -1,13 +1,15 @@
 package com.example.wheellight;
 
 import android.app.Application;
-import android.content.Context;
+
+import com.example.model.WheelDatabase;
 
 public class WheelLightApp extends Application
 {
-	public static Context getContext()
+	@Override
+	public void onCreate() 
 	{
-		//TODO
-		return null;
+		super.onCreate();
+		WheelDatabase.getInstance(getApplicationContext());
 	}
 }
