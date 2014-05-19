@@ -17,6 +17,11 @@ public class Instruction
 	
 	public EInstructionType type;
 	
+	public Instruction(EInstructionType _type)
+	{
+		type = _type;
+	}
+	
 	public static Instruction newFromJson(JSONObject object)
 	{
 		Instruction instru = new Instruction();

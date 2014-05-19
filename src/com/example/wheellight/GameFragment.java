@@ -1,5 +1,7 @@
 package com.example.wheellight;
 
+import instructions.Instruction;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -52,7 +54,7 @@ public class GameFragment extends Fragment{
 	private LinearLayout blueLinear, greenLinear, yellowLinear, blackLinear;
 	private ImageView image;
 	private HashMap<String, ArrayList<String>> moveSequences;
-	private ArrayList<String> moveArray;
+	private ArrayList<Instruction> moveArray;
 	
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
 	{
@@ -224,7 +226,9 @@ public class GameFragment extends Fragment{
 			
 			@Override
 			public void onClick(View v) {
-			//	moveArray = new ArrayList<String>();			
+				moveArray = new ArrayList<Instruction>();
+				move
+				
 				
 				Connectivity_Fragment gameFragment = new Connectivity_Fragment();  
 				Bundle bdl = new Bundle();
