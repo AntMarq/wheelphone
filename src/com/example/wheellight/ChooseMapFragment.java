@@ -16,6 +16,7 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.GridView;
 
 import com.example.adapter.ChooseGridViewAdapter;
+import com.example.model.GameMap;
 import com.example.model.WheelDatabase;
 
 public class ChooseMapFragment extends Fragment{

@@ -9,9 +9,9 @@ import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
 
-import com.example.wheellight.GameMap;
+import com.example.enumClass.TypeOfCell;
+import com.example.model.GameMap;
 import com.example.wheellight.R;
-import com.example.wheellight.TypeOfCell;
 
 public class MapGridViewAdapter extends BaseAdapter{
 

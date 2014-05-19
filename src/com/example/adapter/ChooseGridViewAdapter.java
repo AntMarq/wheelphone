@@ -16,7 +16,7 @@ import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.example.wheellight.GameMap;
+import com.example.model.GameMap;
 import com.example.wheellight.R;
 
 public class ChooseGridViewAdapter extends BaseAdapter {

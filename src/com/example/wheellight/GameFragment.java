@@ -28,7 +28,11 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.example.adapter.MapGridViewAdapter;
+import com.example.enumClass.Move;
+import com.example.enumClass.TypeOfCell;
+import com.example.model.GameMap;
 import com.example.model.WheelDatabase;
+import com.example.utility.Utility;
 
 public class GameFragment extends Fragment{
 	

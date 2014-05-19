@@ -10,9 +10,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.util.Log;
 
-import com.example.wheellight.GameMap;
-import com.example.wheellight.TypeOfCell;
-import com.example.wheellight.Utility;
+import com.example.enumClass.TypeOfCell;
+import com.example.utility.Utility;
 
 
 

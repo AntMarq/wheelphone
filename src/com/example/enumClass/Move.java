@@ -1,4 +1,4 @@
-package com.example.wheellight;
+package com.example.enumClass;
 
 public enum Move {
 
