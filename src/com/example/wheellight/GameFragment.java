@@ -51,7 +51,7 @@ public class GameFragment extends Fragment{
 	private int setColorInChild;
 	private LinearLayout blueLinear, greenLinear, yellowLinear, blackLinear;
 	private ImageView image;
-	private HashMap<String, ArrayList<Move>> moveSequences;
+	private HashMap<String, ArrayList<String>> moveSequences;
 	private ArrayList<String> moveArray;
 	
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
@@ -224,11 +224,8 @@ public class GameFragment extends Fragment{
 			
 			@Override
 			public void onClick(View v) {
-				moveArray = new ArrayList<String>();
-				moveArray.add(Move.left.name());
-				moveArray.add(Move.up.name());
-				moveArray.add(Move.up.name());
-
+			//	moveArray = new ArrayList<String>();			
+				
 				Connectivity_Fragment gameFragment = new Connectivity_Fragment();  
 				Bundle bdl = new Bundle();
 				bdl.putStringArrayList("blue", moveArray);		
