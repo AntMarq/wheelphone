@@ -2,9 +2,9 @@ package com.example.model;
 
 import java.util.ArrayList;
 
-import com.example.enumClass.TypeOfCell;
-
 import android.graphics.Bitmap;
+
+import com.example.enumClass.TypeOfCell;
 
 public class GameMap 
 {

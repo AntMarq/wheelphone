@@ -4,14 +4,14 @@ import instructions.Instruction;
 import instructions.Instruction.EInstructionType;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
+import android.app.Dialog;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -28,22 +28,25 @@ import android.widget.GridView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.adapter.MapGridViewAdapter;
-import com.example.enumClass.Move;
 import com.example.enumClass.TypeOfCell;
 import com.example.model.GameMap;
 import com.example.model.WheelDatabase;
+import com.example.utility.ColorPickerDialog;
 import com.example.utility.Utility;
+import com.example.utility.ColorPickerDialog.OnColorChangedListener;
 
 public class GameFragment extends Fragment{
 	
+	private TextView userInfo;
 	private Button startGame, choosemap;
 	private MapGridViewAdapter adapter; 
-	private ImageButton imageFirstLine, imageSecondLine, imageThirdLine,imageFourthLine;
+	private ImageButton imageButtonColor;
 	private ImageButton left,up,right;
-	private ImageView selectColor,greyImg,redImg;
+	private ImageView selectColor, crossDelete;
 	private int size = 125;
 	private SharedPreferences sh_Pref;
 	private int idMapSelect;
@@ -52,9 +55,8 @@ public class GameFragment extends Fragment{
 	private GridView gridview;
 	private WheelDatabase db;
 	private int setColorInChild;
-	private LinearLayout blueLinear, greenLinear, yellowLinear, blackLinear;
+	private LinearLayout blueLinear, greenLinear, beigeLinear, blackLinear;
 	private ImageView image;
-	private HashMap<String, ArrayList<String>> moveSequences;
 	private ArrayList<Instruction> moveArray;
 	
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
@@ -68,32 +70,28 @@ public class GameFragment extends Fragment{
 			Editor toEdit = sh_Pref.edit();
 			LoadMapInSharePreferences();
 		}
-
+		userInfo = (TextView)view.findViewById(R.id.notice);
 		startGame = (Button)view.findViewById(R.id.startbutton);
 		choosemap = (Button)view.findViewById(R.id.choosemap);
-		imageFirstLine = (ImageButton)view.findViewById(R.id.imageView1);
-		imageSecondLine = (ImageButton)view.findViewById(R.id.imageView2);
-		imageThirdLine = (ImageButton)view.findViewById(R.id.imageView3);
-		imageFourthLine = (ImageButton)view.findViewById(R.id.imageView4);
 		selectColor = (ImageView)view.findViewById(R.id.imageView17);
 		blueLinear =  (LinearLayout)view.findViewById(R.id.LinearLayout15);
 		greenLinear = (LinearLayout)view.findViewById(R.id.linearLayout25);
-		greyImg = (ImageView)view.findViewById(R.id.imageView6);
-		redImg = (ImageView)view.findViewById(R.id.imageView5);
-		yellowLinear = (LinearLayout)view.findViewById(R.id.linearLayout35);
+		beigeLinear = (LinearLayout)view.findViewById(R.id.linearLayout35);
 		blackLinear = (LinearLayout)view.findViewById(R.id.linearLayout45);
-
+		imageButtonColor = (ImageButton)view.findViewById(R.id.imageButtonColor);
+		crossDelete = (ImageView)view.findViewById(R.id.imageView7);
 		
 		left = (ImageButton)view.findViewById(R.id.imageButtonLeft);
 		up = (ImageButton)view.findViewById(R.id.imageButtonUp);
 		right = (ImageButton)view.findViewById(R.id.imageButtonRight);
 
+		userInfo.setText(Html.fromHtml("Selectionner une couleur en cliquant sur le pot de peinture <br /><br /> Remplisser la grille avec la couleur de votre choix <br /><br /> Saisisser la séquence de mouvement en fonction de la couleur selectionnée"));
+		userInfo.setBackgroundColor(getResources().getColor(R.color.white));
+		
 ///////////////////////////////////////////////////////////////////////////
 ///////////////////////// Insert Arrow in layout ///////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-		
-		
 		left.setOnClickListener(new OnClickListener() {			
 			@Override
 			public void onClick(View v) {
@@ -114,72 +112,42 @@ public class GameFragment extends Fragment{
 				identifyLayout(up);
 			}
 		});
+///////////////////////////////////////////////////////////////////////////
+/////////////////////Reset Instruction in Layout //////////////////////////
+///////////////////////////////////////////////////////////////////////////			
+		crossDelete.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				blueLinear.removeAllViewsInLayout();
+				blueLinear.refreshDrawableState();
+			}
+		});
 		
 ///////////////////////////////////////////////////////////////////////////
 /////////////////////Select Color to change gridView item color////////////
 ///////////////////////////////////////////////////////////////////////////		
-		
-		
-		imageFirstLine.setOnClickListener(new OnClickListener() {
-			
-			@Override
-			public void onClick(View v) {	
-				setColorInChild = Color.BLUE;
-				selectColor.setBackgroundColor(setColorInChild);
-				
-			}
-		});
-		imageSecondLine.setOnClickListener(new OnClickListener() {
+		final OnColorChangedListener listener=new OnColorChangedListener() {  
+		       @Override  
+		       public void colorChanged(int color) {  
+		        setColorInChild = color;
+				selectColor.setImageResource(color);
+		       }  
+		     };
+		     
+		imageButtonColor.setOnClickListener(new OnClickListener() {
 			
 			@Override
 			public void onClick(View v) {
-				setColorInChild = Color.GREEN;
-				selectColor.setBackgroundColor(setColorInChild);
+				Dialog dialog = new ColorPickerDialog(getActivity(),listener);			
+				dialog.show();
 			}
-		});
-
-		imageThirdLine.setOnClickListener(new OnClickListener() {
-			
-			@Override
-			public void onClick(View v) {
-				setColorInChild = Color.YELLOW;
-				selectColor.setBackgroundColor(setColorInChild);
-			}
-		});
-		
-		imageFourthLine.setOnClickListener(new OnClickListener() {
-			
-			@Override
-			public void onClick(View v) {
-				setColorInChild = Color.BLACK;
-				selectColor.setBackgroundColor(setColorInChild);
-			}
-		});
-		
-		redImg.setOnClickListener(new OnClickListener() {
-			
-			@Override
-			public void onClick(View v) {
-				setColorInChild = Color.RED;
-				selectColor.setBackgroundColor(setColorInChild);			
-			}
-		});
-		
-		greyImg.setOnClickListener(new OnClickListener() {
-			
-			@Override
-			public void onClick(View v) {
-				setColorInChild = Color.LTGRAY;
-				selectColor.setBackgroundColor(setColorInChild);
-			}
-		});
-		
+		});  
 		
 		gridview = (GridView)view.findViewById(R.id.game_gridview);
 		adapter = new MapGridViewAdapter(getActivity().getApplicationContext(), size, mapSelect);
 		gridview.setDrawingCacheEnabled(true);
-		gridview.setAdapter(adapter);
-		
+		gridview.setAdapter(adapter);		
 		gridview.setOnItemClickListener(new OnItemClickListener() {
 
 			@Override
@@ -188,40 +156,39 @@ public class GameFragment extends Fragment{
 				if(position == 0 || position == 24)
 				{
 					//nothing
-					Log.v(tag, "click on item 0 or 24");
 				}
 				else
 				{
 					ArrayList<TypeOfCell> structureMap = mapSelect.getMapStructure();
 					switch(setColorInChild) 
 					{
-				    case Color.BLUE:
+				    case R.color.dark_blue:
 				    	structureMap.set(position,TypeOfCell.Blue);
 				        break;
-				    case Color.YELLOW:
-				    	structureMap.set(position,TypeOfCell.Yellow);
+				    case R.color.beige:
+				    	structureMap.set(position,TypeOfCell.Beige);
 				        break;
-				    case Color.BLACK:
+				    case R.color.noir:
 				    	structureMap.set(position,TypeOfCell.Black);
 				        break;
-				    case Color.GREEN:
+				    case R.color.green:
 				    	structureMap.set(position,TypeOfCell.Green);
 				        break;
-				    case Color.LTGRAY:
+				    case R.color.grisclair:
 				    	structureMap.set(position,TypeOfCell.None);
 				        break;
-				    case Color.RED:
+				    case R.color.color_red:
 				    	structureMap.set(position,TypeOfCell.Red);
 				        break;
-				   /* default:
-				    	structureMap.set(position,TypeOfCell.None);*/
-				   //     Log.v(tag, "structureMapModified = " + structureMap);
-						
 					}
 				}
 				adapter.notifyDataSetChanged();
 			}
 		});
+		
+///////////////////////////////////////////////////////////////////////////
+/////////////////////Send Instruction to Connectivity Fragment/////////////
+///////////////////////////////////////////////////////////////////////////
 		
 		startGame.setOnClickListener(new OnClickListener() {
 			
@@ -249,32 +216,28 @@ public class GameFragment extends Fragment{
 			}
 		});
 		
-		choosemap.setOnClickListener(new OnClickListener() {
-			
+		choosemap.setOnClickListener(new OnClickListener() 
+		{	
 			@Override
 			public void onClick(View v) {
+				saveMapInGridView();
 				ChooseMapFragment chooseMapFragment = new ChooseMapFragment();       
 		        getFragmentManager().beginTransaction()
 		                .replace(R.id.mainfragment, chooseMapFragment)
 		                .addToBackStack(null)
 		                .commit();					
 			}
-		});
-		
+		});		
 		return view;
 	}
 	
 
 	private void LoadMapInSharePreferences()
 	{
-		Log.v(tag, "LoadMapInSharePreferences " );
 		idMapSelect = sh_Pref.getInt("id", 0); // getting int
-		Log.v(tag, "idMapSelect = " + idMapSelect);
 		if(idMapSelect != 0)
-		{
-			
-			mapSelect = db.getSelectMap(idMapSelect);
-		
+		{		
+			mapSelect = db.getSelectMap(idMapSelect);		
 		}
 		else
 		{
@@ -283,7 +246,6 @@ public class GameFragment extends Fragment{
 		}
 	}
 	
-
 	@Override
 	public void onCreateOptionsMenu (Menu menu, MenuInflater inflater)
 	{
@@ -308,39 +270,34 @@ public class GameFragment extends Fragment{
 		{
 			db.saveImageinDB(mapSelect,Utility.getBytes(bm));
 		}
-		else
-		{
-			Toast.makeText(getActivity(), "la map actuelle n'est pas sauvegardée", Toast.LENGTH_SHORT).show();
-		}
-		
 	}
 	
 	public void identifyLayout(ImageButton imgBtn)
 	{
 		if(setColorInChild != 0 )
-		{
-			if(setColorInChild == Color.BLUE)
+		{			
+			if(setColorInChild == R.color.dark_blue)
 			{
 				if(blueLinear.getChildCount() < 3 )
 				{
 					drawImageArrowInLayout(blueLinear,imgBtn);
 				}else
 				{
-					Toast.makeText(getActivity(), "3 mouvements max par couleur", Toast.LENGTH_SHORT).show();
+					displayToast();
 				}
 			}
-			else if(setColorInChild == Color.YELLOW)
+			else if(setColorInChild == R.color.beige)
 			{
-				if(yellowLinear.getChildCount() < 3 )
+				if(beigeLinear.getChildCount() < 3 )
 				{
-					drawImageArrowInLayout(yellowLinear, imgBtn);
+					drawImageArrowInLayout(beigeLinear, imgBtn);
 				}
 				else
 				{
-					Toast.makeText(getActivity(), "3 mouvements max par couleur", Toast.LENGTH_SHORT).show();
+					displayToast();
 				}
 			}
-			else if(setColorInChild == Color.GREEN)
+			else if(setColorInChild == R.color.green)
 			{
 				if(greenLinear.getChildCount() < 3 )
 				{
@@ -348,10 +305,10 @@ public class GameFragment extends Fragment{
 				}
 				else
 				{
-					Toast.makeText(getActivity(), "3 mouvements max par couleur", Toast.LENGTH_SHORT).show();
+					displayToast();
 				}
 			}
-			else if(setColorInChild == Color.BLACK)
+			else if(setColorInChild == R.color.noir)
 			{
 				if(blackLinear.getChildCount() < 3 )
 				{
@@ -359,8 +316,12 @@ public class GameFragment extends Fragment{
 				}
 				else
 				{
-					Toast.makeText(getActivity(), "3 mouvements max par couleur", Toast.LENGTH_SHORT).show();
+					displayToast();
 				}
+			}
+			else if(setColorInChild == R.color.grisclair  || setColorInChild == R.color.color_red)
+			{
+				Toast.makeText(getActivity(), "Aucune instruction disponible pour cette couleur", Toast.LENGTH_SHORT).show();
 			}
 		}
 		else
@@ -373,9 +334,14 @@ public class GameFragment extends Fragment{
 	{
 		image = new ImageView(getActivity());
 		image.setImageDrawable(btn.getDrawable());
-		image.setLayoutParams(new LayoutParams(64, 64) {});
-		image.setPadding(25, 0, 5, 12);					
+		image.setLayoutParams(new LayoutParams(48, 48) {});
+		image.setPadding(20, 10, 0, 10);					
 		selectLinear.addView(image);
+	}
+	
+	public void displayToast()
+	{
+		Toast.makeText(getActivity(), "3 mouvements max par couleur", Toast.LENGTH_SHORT).show();
 	}
 
 }
