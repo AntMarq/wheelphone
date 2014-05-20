@@ -9,10 +9,7 @@ import java.util.HashMap;
 import android.app.Dialog;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
-import android.content.res.Resources;
 import android.graphics.Bitmap;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -41,8 +38,8 @@ import com.example.enumClass.TypeOfCell;
 import com.example.model.GameMap;
 import com.example.model.WheelDatabase;
 import com.example.utility.ColorPickerDialog;
-import com.example.utility.Utility;
 import com.example.utility.ColorPickerDialog.OnColorChangedListener;
+import com.example.utility.Utility;
 
 public class GameFragment extends Fragment{
 	
@@ -102,7 +99,7 @@ public class GameFragment extends Fragment{
 		up = (ImageButton)view.findViewById(R.id.imageButtonUp);
 		right = (ImageButton)view.findViewById(R.id.imageButtonRight);
 
-		userInfo.setText(Html.fromHtml("Selectionner une couleur en cliquant sur le pot de peinture <br /><br /> Remplisser la grille avec la couleur de votre choix <br /><br /> &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp et/ou <br /><br /> Saisisser la séquence de mouvement en fonction de la couleur selectionnée"));
+		userInfo.setText(Html.fromHtml("Selectionner une couleur en cliquant sur le pot de peinture <br /><br /> Remplisser la grille avec la couleur de votre choix <br /><br /> &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp et/ou <br /><br /> Saisisser la sÔøΩquence de mouvement en fonction de la couleur selectionnÔøΩe"));
 		userInfo.setBackgroundColor(getResources().getColor(R.color.white));
 		
 		if(selectColor.getBackground() != null)
@@ -304,7 +301,7 @@ public class GameFragment extends Fragment{
 		else
 		{
 			mapSelect = db.getSelectMap(1);
-			Toast.makeText(getActivity().getApplicationContext(), "map par defaut chargée", Toast.LENGTH_SHORT).show();
+			Toast.makeText(getActivity().getApplicationContext(), "map par defaut chargÔøΩe", Toast.LENGTH_SHORT).show();
 		}
 	}
 	
@@ -399,7 +396,7 @@ public class GameFragment extends Fragment{
 		}
 		else
 		{
-			Toast.makeText(getActivity(), "Sélectionner une couleur et cliquer sur une flèche", Toast.LENGTH_SHORT).show();
+			Toast.makeText(getActivity(), "SÔøΩlectionner une couleur et cliquer sur une flÔøΩche", Toast.LENGTH_SHORT).show();
 		}
 	}
 	
@@ -424,71 +421,81 @@ public class GameFragment extends Fragment{
 		sendStructure = new ArrayList<Instruction>();
 		
 		int[] startTabMove = colorInstruction(startLinear,"Start");
-		Log.v(tag, "startTabMove = " + startTabMove.length);
+		Log.v(tag, "startTabMove = {" + startTabMove[0] + ", " + startTabMove[1] + ", " + startTabMove[2] + "}");
 		int[] blueTabMove = colorInstruction(blueLinear,"Blue");
-		Log.v(tag, "blueTabMove = " + blueTabMove.length);
+		Log.v(tag, "blueTabMove = {" + blueTabMove[0] + ", " + blueTabMove[1] + ", " + blueTabMove[2] + "}");
 		int[] greenTabMove = colorInstruction(greenLinear,"Green");
-		Log.v(tag, "greenTabMove = " + greenTabMove.length);
+		Log.v(tag, "greenTabMove = {" + greenTabMove[0] + ", " + greenTabMove[1] + ", " + greenTabMove[2] + "}");
 		int[] blackTabMove = colorInstruction(blackLinear,"Black");
-		Log.v(tag, "blackTabMove = " + blackTabMove.length);
+		Log.v(tag, "blackTabMove = {" + blackTabMove[0] + ", " + blackTabMove[1] + ", " + blackTabMove[2] + "}");
 		int[] beigeTabMove = colorInstruction(beigeLinear,"Beige");
-		Log.v(tag, "beigeTabMove = " + beigeTabMove.length);
+		Log.v(tag, "beigeTabMove = {" + beigeTabMove[0] + ", " + beigeTabMove[1] + ", " + beigeTabMove[2] + "}");
+		
 		//Start
 		sendStructure.add(new Instruction(EInstructionType.Start));		
 		ArrayList<Instruction> tmp = colorsInstructions.get("Start");
 		Log.v(tag, "tmp = " + tmp.size());
-		for(int i =0 ; i < tmp.size() ; i++)
-		{			
-			sendStructure.add(tmp.get(i));
-		}
 		
-		gridIndex = startTabMove[0] * forwardIndent;
-		Log.v(tag, "structuremap = " + structureMap);
-		while(gridIndex != 24 || sendStructure.get(sendStructure.size()).equals(new Instruction(EInstructionType.Lose))) {
-			switch(structureMap.get(gridIndex))
-			{
-				case Blue:
-					tmp = colorsInstructions.get("Blue");
-					
-					forwardIndent = setForwardIndent(blueTabMove, forwardIndent);
-					gridIndex = gridIndex + (blueTabMove[0] * forwardIndent);
-			        break;
-			    case Beige:
-			    	tmp = colorsInstructions.get("Beige");
-			    	
-			    	forwardIndent = setForwardIndent(beigeTabMove, forwardIndent);
-			    	gridIndex = gridIndex + (beigeTabMove[0] * forwardIndent);
-			        break;
-			    case Black:
-			    	tmp = colorsInstructions.get("Black");
-			    	
-			    	forwardIndent = setForwardIndent(blackTabMove, forwardIndent);
-			    	gridIndex = gridIndex + (blackTabMove[0] * forwardIndent);
-			        break;
-			    case Green:
-			    	tmp = colorsInstructions.get("Green");
-			    	
-			    	forwardIndent = setForwardIndent(greenTabMove, forwardIndent);
-			    	gridIndex = gridIndex + (greenTabMove[0] * forwardIndent);
-			        break;
-			    default:
-			    	sendStructure.add(new Instruction(EInstructionType.Lose));
-			    	break;
-			}
-			Log.v(tag, "sendstructure = " + sendStructure);
+		if(tmp.size() <= 0) {
 			
-			if(!(sendStructure.get(sendStructure.size()).equals(new Instruction(EInstructionType.Lose)))) {
-				for(int i =0 ; i < tmp.size() ; i++)
-				{			
-					sendStructure.add(tmp.get(i));
+			Log.v(tag, "LOSE !");
+			sendStructure.add(new Instruction(EInstructionType.Lose));
+			
+		} else {
+			for(int i = 0 ; i < tmp.size() ; i++)
+			{			
+				sendStructure.add(tmp.get(i));
+			}
+			
+			gridIndex = startTabMove[0] * forwardIndent;
+			
+			Log.v(tag, "structuremap = " + structureMap);
+			while(gridIndex != 24 || sendStructure.get(sendStructure.size() - 1).equals(new Instruction(EInstructionType.Lose))) {
+				switch(structureMap.get(gridIndex))
+				{
+					case Blue:
+						tmp = colorsInstructions.get("Blue");
+						
+						forwardIndent = setForwardIndent(blueTabMove, forwardIndent);
+						gridIndex = gridIndex + (blueTabMove[0] * forwardIndent);
+				        break;
+				    case Beige:
+				    	tmp = colorsInstructions.get("Beige");
+				    	
+				    	forwardIndent = setForwardIndent(beigeTabMove, forwardIndent);
+				    	gridIndex = gridIndex + (beigeTabMove[0] * forwardIndent);
+				        break;
+				    case Black:
+				    	tmp = colorsInstructions.get("Black");
+				    	
+				    	forwardIndent = setForwardIndent(blackTabMove, forwardIndent);
+				    	gridIndex = gridIndex + (blackTabMove[0] * forwardIndent);
+				        break;
+				    case Green:
+				    	tmp = colorsInstructions.get("Green");
+				    	
+				    	forwardIndent = setForwardIndent(greenTabMove, forwardIndent);
+				    	gridIndex = gridIndex + (greenTabMove[0] * forwardIndent);
+				        break;
+				    default:
+				    	Log.v(tag, "LOSE !");
+				    	sendStructure.add(new Instruction(EInstructionType.Lose));
+				    	break;
+				}
+				Log.v(tag, "sendstructure = " + sendStructure);
+				
+				if(!(sendStructure.get(sendStructure.size() - 1 ).equals(new Instruction(EInstructionType.Lose)))) {
+					for(int i =0 ; i < tmp.size() ; i++)
+					{			
+						sendStructure.add(tmp.get(i));
+					}
+				}
+				if(gridIndex == 24) {
+					Log.v(tag, "WIN !");
+					sendStructure.add(new Instruction(EInstructionType.Win));
 				}
 			}
-			if(gridIndex == 24) {
-				sendStructure.add(new Instruction(EInstructionType.Win));
-			}
 		}
-		
-		
 	}
 	
 	private int[] colorInstruction(LinearLayout ll,String key)
