@@ -424,14 +424,19 @@ public class GameFragment extends Fragment{
 		sendStructure = new ArrayList<Instruction>();
 		
 		int[] startTabMove = colorInstruction(startLinear,"Start");
+		Log.v(tag, "startTabMove = " + startTabMove.length);
 		int[] blueTabMove = colorInstruction(blueLinear,"Blue");
+		Log.v(tag, "blueTabMove = " + blueTabMove.length);
 		int[] greenTabMove = colorInstruction(greenLinear,"Green");
+		Log.v(tag, "greenTabMove = " + greenTabMove.length);
 		int[] blackTabMove = colorInstruction(blackLinear,"Black");
+		Log.v(tag, "blackTabMove = " + blackTabMove.length);
 		int[] beigeTabMove = colorInstruction(beigeLinear,"Beige");
-		
+		Log.v(tag, "beigeTabMove = " + beigeTabMove.length);
 		//Start
 		sendStructure.add(new Instruction(EInstructionType.Start));		
-		ArrayList<Instruction> tmp = colorsInstructions.get("Start");		
+		ArrayList<Instruction> tmp = colorsInstructions.get("Start");
+		Log.v(tag, "tmp = " + tmp.size());
 		for(int i =0 ; i < tmp.size() ; i++)
 		{			
 			sendStructure.add(tmp.get(i));
@@ -470,7 +475,9 @@ public class GameFragment extends Fragment{
 			    	sendStructure.add(new Instruction(EInstructionType.Lose));
 			    	break;
 			}
-			if(!sendStructure.get(sendStructure.size()).equals(new Instruction(EInstructionType.Lose))) {
+			Log.v(tag, "sendstructure = " + sendStructure);
+			
+			if(!(sendStructure.get(sendStructure.size()).equals(new Instruction(EInstructionType.Lose)))) {
 				for(int i =0 ; i < tmp.size() ; i++)
 				{			
 					sendStructure.add(tmp.get(i));
@@ -493,7 +500,7 @@ public class GameFragment extends Fragment{
 		{	
 			for(int i = 0 ; i<childCount; i++)
 			{
-				ImageView d = (ImageView) startLinear.getChildAt(i);
+				ImageView d = (ImageView) ll.getChildAt(i);
 				Drawable drw = d.getDrawable();			
 				if(up.getDrawable() == drw)
 				{
