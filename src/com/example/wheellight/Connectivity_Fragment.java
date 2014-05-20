@@ -1,17 +1,12 @@
 package com.example.wheellight;
 
+import instructions.Instruction;
+import instructions.Instruction.EInstructionType;
+
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
-import com.example.wheellight.network.ClientManager;
-import com.example.wheellight.network.IClientManagerListener;
-import com.example.wheellight.network.IWifiP2PListener;
-import com.example.wheellight.network.WiFiDirectBroadcastReceiver;
 
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -25,11 +20,10 @@ import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.net.wifi.p2p.WifiP2pManager.ActionListener;
 import android.net.wifi.p2p.WifiP2pManager.Channel;
+import android.net.wifi.p2p.WifiP2pManager.ConnectionInfoListener;
 import android.net.wifi.p2p.WifiP2pManager.PeerListListener;
 import android.os.Bundle;
-import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -37,12 +31,16 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
-import android.widget.SimpleAdapter;
 import android.widget.TextView;
-import android.widget.Toast;
+
+import com.example.wheellight.network.ConnectionManager;
+import com.example.wheellight.network.IConnectionManagerListener;
+import com.example.wheellight.network.IWifiP2PListener;
+import com.example.wheellight.network.RequestManager;
+import com.example.wheellight.network.WiFiDirectBroadcastReceiver;
 
 
-public class Connectivity_Fragment extends Fragment implements IWifiP2PListener, PeerListListener, IClientManagerListener
+public class Connectivity_Fragment extends Fragment implements IWifiP2PListener, PeerListListener, IConnectionManagerListener, ConnectionInfoListener 
 {
 	
 	WifiP2pManager mManager;
@@ -50,21 +48,24 @@ public class Connectivity_Fragment extends Fragment implements IWifiP2PListener,
 	BroadcastReceiver mReceiver;	
 	IntentFilter mIntentFilter;
 	
-	WifiP2pDevice connectingDevice;
 	WheelLightApp context;
 	
 	ListView mListView;
-	WifiP2pDeviceList peers;
+	ArrayList<WifiP2pDevice> peers = new ArrayList<WifiP2pDevice>();
 	
 	ProgressDialog progressDialog;
 	boolean isWifiEnabled = false;
 	boolean isWifiPaired = false;
+	boolean isConnecting = false;
+	boolean isConnected = false;
+	
+	WifiP2pInfo info;
 	
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
 	{
 		View view = inflater.inflate(getResources().getLayout(R.layout.connectivity_fragment), container, false);
 		context = (WheelLightApp) getActivity().getApplicationContext();
-		
+		Bundle b = getArguments();
 		mListView = (ListView)view.findViewById(R.id.connection_list);
 		mListView.setAdapter(new DeviceP2PAdapter());
 		mListView.setOnItemClickListener(new OnItemClickListener()
@@ -74,9 +75,9 @@ public class Connectivity_Fragment extends Fragment implements IWifiP2PListener,
 			{
 				if(peers != null)
 				{
-					Iterator<WifiP2pDevice> it = peers.getDeviceList().iterator();
+					Iterator<WifiP2pDevice> it = peers.iterator();
 					WifiP2pDevice target = null;
-					if(peers.getDeviceList().size() > _pos)
+					if(peers.size() > _pos)
 					{
 						for(int i = 0; i <= _pos ; i++)
 						{
@@ -105,110 +106,117 @@ public class Connectivity_Fragment extends Fragment implements IWifiP2PListener,
 	    
 	    return view;
 	}
-
+	
 	@Override
+	public void setWifiP2pEnabled(boolean _state)
+	{
+		isWifiEnabled = _state;
+		if(isWifiEnabled)
+			onWifiP2PEnable();
+		else
+			onWifiP2PDisable();
+		
+	}
+
 	public void onWifiP2PEnable()
 	{
-		isWifiEnabled = true;
-		if(peers == null || peers.getDeviceList().size() == 0)
+		if(isConnected)
+			return;
+		
+		if(info != null && info.groupFormed)
+			return;
+		
+		if(progressDialog != null && progressDialog.isShowing())
+			progressDialog.dismiss();
+		
+		progressDialog = ProgressDialog.show(getActivity(), "Please wait", "Finding peers...", true);
+		progressDialog.setCancelable(true);
+		progressDialog.setOnCancelListener(new OnCancelListener()
 		{
-			if(progressDialog != null)
-				progressDialog.dismiss();
-			
-			progressDialog = ProgressDialog.show(getActivity(), "Please wait", "Searching for local peers...", true);
-			progressDialog.setCancelable(true);
-			progressDialog.setOnCancelListener(new OnCancelListener()
+			@Override
+			public void onCancel(DialogInterface _dialog)
 			{
-				@Override
-				public void onCancel(DialogInterface _dialog)
-				{
-					_dialog.dismiss();
-					if(dialogCount == 0)
-						getFragmentManager().popBackStackImmediate();
-				}
-			});
-			
-			mManager.discoverPeers(mChannel, new WifiP2pManager.ActionListener()
-			{
-			    @Override
-			    public void onSuccess()
-			    {
-			    }
+				_dialog.dismiss();
+				if(dialogCount == 0)
+					getFragmentManager().popBackStackImmediate();
+			}
+		});
+		
+		mManager.discoverPeers(mChannel, new WifiP2pManager.ActionListener()
+		{
+		    @Override
+		    public void onSuccess()
+		    {
+		    }
 
-			    @Override
-			    public void onFailure(int reasonCode)
-			    {
-			    	progressDialog.dismiss();
-			    	showDialog("Connection error" , "Failed to discover local peers." , true, true);
-			    }
-			});
-		}
-		else
-		{
-			onPeersAvailable(peers);
-		}
+		    @Override
+		    public void onFailure(int reasonCode)
+		    {
+		    	progressDialog.dismiss();
+		    	showDialog("Connection error" , "Failed to discover local peers." , true, true);
+		    }
+		});
 	}
 
-	@Override
 	public void onWifiP2PDisable()
 	{
-		isWifiEnabled = false;
-
-		if(peers == null)
+		if(progressDialog != null && progressDialog.isShowing())
+			progressDialog.dismiss();
+		
+		progressDialog = ProgressDialog.show(getActivity(), "Wifi Direct is Disabled", "Please enable your Wifi Direct...", true);
+		progressDialog.setCancelable(true);
+		progressDialog.setOnCancelListener(new OnCancelListener()
 		{
-			if(progressDialog != null)
-				progressDialog.dismiss();
-			
-			progressDialog = ProgressDialog.show(getActivity(), "Wifi Direct is Disabled", "Please enable your Wifi Direct...", true);
-			progressDialog.setCancelable(true);
-			progressDialog.setOnCancelListener(new OnCancelListener()
+			@Override
+			public void onCancel(DialogInterface _dialog)
 			{
-				@Override
-				public void onCancel(DialogInterface _dialog)
-				{
-					_dialog.dismiss();
-					if(dialogCount == 0)
-						getFragmentManager().popBackStackImmediate();
-				}
-			});
-		}
+				_dialog.dismiss();
+				if(dialogCount == 0)
+					getFragmentManager().popBackStackImmediate();
+			}
+		});
 	}
 
-	@Override
-	public void onPeersChanged()
-	{
-		if(connectingDevice == null)
-		{
-			if (mManager != null)
-		    {
-		        mManager.requestPeers(mChannel, this);
-		    }
-		}
-	}
-	
 	@Override
 	public void onPeersAvailable(WifiP2pDeviceList _peers)
 	{	
-		if(connectingDevice == null)
-		{
-			peers = _peers;
-	
-			if(progressDialog != null)
-				progressDialog.dismiss();
-			
-			((DeviceP2PAdapter)mListView.getAdapter()).setData(peers);
-		}
-	}
+		if(isConnected)
+			return;
+		
+		if(info != null && info.groupFormed || isConnecting)
+			return;
+		
+	    if (progressDialog != null && progressDialog.isShowing())
+	        progressDialog.dismiss();
+	    
+        peers.clear();
+        peers.addAll(_peers.getDeviceList());
+        ((DeviceP2PAdapter)mListView.getAdapter()).setData(peers);
+        if (peers.size() == 0)
+        {
+            showDialog("No peer found", "Couldn't find any local peer.", true, true);
+            return;
+        }
+    }
+
+    public void clearPeers()
+    {
+        peers.clear();
+        ((DeviceP2PAdapter)mListView.getAdapter()).setData(peers);
+    }
 	
 	public void openConnectionWithDevice(final WifiP2pDevice _device)
 	{
-		connectingDevice = _device;
+		if(isConnected)
+			return;
+		
+		isConnecting = true;
 		//obtain a peer from the WifiP2pDeviceList
 		WifiP2pConfig config = new WifiP2pConfig();
 		config.deviceAddress = _device.deviceAddress;
 		
 		
-		if(progressDialog != null)
+		if(progressDialog != null && progressDialog.isShowing())
 			progressDialog.dismiss();
 		
 		progressDialog = ProgressDialog.show(getActivity(), "Please wait", "Waiting for target response.", true);
@@ -236,42 +244,55 @@ public class Connectivity_Fragment extends Fragment implements IWifiP2PListener,
 		    @Override
 		    public void onFailure(int reason)
 		    {
+		    	isConnecting = false;
 		    }
 		});
 	}
+	
 
 	@Override
-	public void onWifiTunnelMade(WifiP2pInfo _info)
+	public void onConnectionInfoAvailable(final WifiP2pInfo _info)
 	{
-		isWifiPaired = true;
-		if(progressDialog != null)
-			progressDialog.dismiss();
+		if(isConnected)
+			return;
 		
-		ClientManager.getInstance().startListening(this);
-		progressDialog = ProgressDialog.show(getActivity(), "Server", "Server socket awaiting connection.", true);
-		progressDialog.setCancelable(true);
-		progressDialog.setOnCancelListener(new OnCancelListener()
+		if(isConnecting || info == null)
 		{
-			@Override
-			public void onCancel(DialogInterface _dialog)
-			{
-				_dialog.dismiss();
-				if(dialogCount == 0)
-					getFragmentManager().popBackStackImmediate();
-			}
-		});
-	}
-
-	@Override
-	public void onWifiTunnelLost(WifiP2pInfo _info)
-	{
-		if(isWifiPaired && connectingDevice != null)
-		{
-			isWifiPaired = false;
-			if(progressDialog != null)
-				progressDialog.dismiss();
+			isConnecting = false;
 			
-			showDialog("Connection lost" , "The connection with the other device has been lost." , true , true);
+		    if (progressDialog != null && progressDialog.isShowing())
+		        progressDialog.dismiss();
+		    
+		    info = _info;
+	
+			// InetAddress from WifiP2pInfo struct.
+			// info.groupOwnerAddress.getHostAddress();
+			
+			// After the group negotiation, we assign the group owner as the file
+			// server. The file server is single threaded, single connection server
+			// socket.
+			if (info.groupFormed && info.isGroupOwner)
+			{
+				
+				if(progressDialog != null)
+					progressDialog.dismiss();
+				
+				ConnectionManager.getInstance().startListening(this);
+				progressDialog = ProgressDialog.show(getActivity(), "Server", "Server socket awaiting connection.", true);
+				progressDialog.setCancelable(true);
+				progressDialog.setOnCancelListener(new OnCancelListener()
+				{
+					@Override
+					public void onCancel(DialogInterface _dialog)
+					{
+						_dialog.dismiss();
+						if(dialogCount == 0)
+							getFragmentManager().popBackStackImmediate();
+					}
+				});
+			}
+			
+			clearPeers();
 		}
 	}
 	
@@ -294,7 +315,11 @@ public class Connectivity_Fragment extends Fragment implements IWifiP2PListener,
 	public void onDestroy()
 	{
 		super.onDestroy();
-		ClientManager.getInstance().closeConnection();
+		ConnectionManager.getInstance().closeConnection();
+		isWifiEnabled = false;
+		isWifiPaired = false;
+		isConnecting = false;
+		isConnected = false;
 	}
 
 	private class DeviceP2PAdapter extends BaseAdapter
@@ -307,10 +332,10 @@ public class Connectivity_Fragment extends Fragment implements IWifiP2PListener,
 
 		}
 		
-		public void setData(WifiP2pDeviceList _deviceList)
+		public void setData(ArrayList<WifiP2pDevice> _peers)
 		{
 			data.clear();
-			for(WifiP2pDevice device : _deviceList.getDeviceList())
+			for(WifiP2pDevice device : _peers)
 			{
 				data.add(device.deviceName);
 			}
@@ -395,9 +420,7 @@ public class Connectivity_Fragment extends Fragment implements IWifiP2PListener,
 				{
 					dialogCount--;
 					dialog.dismiss();
-					peers = null;
-					connectingDevice = null;
-					((BaseAdapter)mListView.getAdapter()).notifyDataSetChanged();
+					clearPeers();
 					if(isWifiEnabled)
 						onWifiP2PEnable();
 					else
@@ -416,9 +439,10 @@ public class Connectivity_Fragment extends Fragment implements IWifiP2PListener,
 	}
 
 	@Override
-	public void onSocketOpen()
+	public void onConnectionOpened()
 	{
-		if(progressDialog!=null)
+		isConnected = true;
+		if(progressDialog != null && progressDialog.isShowing())
 			progressDialog.dismiss();
 		
 		progressDialog = ProgressDialog.show(getActivity(), "Socket", "Socket is opened. Feel free to transfer data.", true);
@@ -433,11 +457,26 @@ public class Connectivity_Fragment extends Fragment implements IWifiP2PListener,
 					getFragmentManager().popBackStackImmediate();
 			}
 		});
+		
+		ArrayList<Instruction> instrus = new ArrayList<Instruction>();
+		instrus.add(new Instruction(EInstructionType.Start));
+		instrus.add(new Instruction(EInstructionType.Forward));
+		instrus.add(new Instruction(EInstructionType.Left));
+		
+		RequestManager.getInstance().sendInstructions(instrus);
 	}
 
 	@Override
-	public void onSocketClose()
+	public void onConnectionClosed()
 	{
+		isConnected = false;
+		if(progressDialog != null && progressDialog.isShowing())
+			progressDialog.dismiss();
 	}
 
+	@Override
+	public void resetP2pState()
+	{
+		clearPeers();
+	}
 }

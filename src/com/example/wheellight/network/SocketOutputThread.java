@@ -1,25 +1,27 @@
 package com.example.wheellight.network;
 
 
-import java.io.BufferedWriter;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.net.Socket;
 
 import org.json.JSONArray;
 
+import android.util.Log;
+
 public class SocketOutputThread extends Thread
 {
 	Socket socket;
-	BufferedWriter writer;
+	PrintWriter writer;
 	JSONArray json;
 	
-	public SocketOutputThread(Socket _socket , JSONArray json)
+	public SocketOutputThread(Socket _socket , JSONArray _json)
 	{
 		socket = _socket;
+		json = _json;
 		try
 		{
-			writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+			writer = new PrintWriter(socket.getOutputStream(), true);
 		}
 		catch (IOException e)
 		{
@@ -30,16 +32,22 @@ public class SocketOutputThread extends Thread
 	@Override
 	public void run()
 	{
+		while(true)
+		{
 		if(socket.isConnected())
 		{
 			try
 			{
-				writer.write(json.toString());
+				Thread.sleep(3000);
+				writer.println(json.toString());
+				Log.e("wdfsfq","Writing message");
 			}
-			catch (IOException e)
+			catch (InterruptedException e1)
 			{
-				e.printStackTrace();
+				e1.printStackTrace();
 			}
+
+		}
 		}
 	}
 }
