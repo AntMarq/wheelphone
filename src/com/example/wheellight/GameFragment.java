@@ -419,7 +419,7 @@ public class GameFragment extends Fragment{
 		int gridIndex = 0;
 		int forwardIndent = 1;
 		sendStructure = new ArrayList<Instruction>();
-		
+
 		int[] startTabMove = colorInstruction(startLinear,"Start");
 		Log.v(tag, "startTabMove = {" + startTabMove[0] + ", " + startTabMove[1] + ", " + startTabMove[2] + "}");
 		int[] blueTabMove = colorInstruction(blueLinear,"Blue");
@@ -430,50 +430,50 @@ public class GameFragment extends Fragment{
 		Log.v(tag, "blackTabMove = {" + blackTabMove[0] + ", " + blackTabMove[1] + ", " + blackTabMove[2] + "}");
 		int[] beigeTabMove = colorInstruction(beigeLinear,"Beige");
 		Log.v(tag, "beigeTabMove = {" + beigeTabMove[0] + ", " + beigeTabMove[1] + ", " + beigeTabMove[2] + "}");
-		
+
 		//Start
 		sendStructure.add(new Instruction(EInstructionType.Start));		
 		ArrayList<Instruction> tmp = colorsInstructions.get("Start");
 		Log.v(tag, "tmp = " + tmp.size());
-		
+
 		if(tmp.size() <= 0) {
-			
+
 			Log.v(tag, "LOSE !");
 			sendStructure.add(new Instruction(EInstructionType.Lose));
-			
+
 		} else {
 			for(int i = 0 ; i < tmp.size() ; i++)
 			{			
 				sendStructure.add(tmp.get(i));
 			}
-			
+
 			gridIndex = startTabMove[0] * forwardIndent;
-			
+
 			Log.v(tag, "structuremap = " + structureMap);
 			while(gridIndex != 24 || sendStructure.get(sendStructure.size() - 1).equals(new Instruction(EInstructionType.Lose))) {
 				switch(structureMap.get(gridIndex))
 				{
 					case Blue:
 						tmp = colorsInstructions.get("Blue");
-						
+
 						forwardIndent = setForwardIndent(blueTabMove, forwardIndent);
 						gridIndex = gridIndex + (blueTabMove[0] * forwardIndent);
 				        break;
 				    case Beige:
 				    	tmp = colorsInstructions.get("Beige");
-				    	
+
 				    	forwardIndent = setForwardIndent(beigeTabMove, forwardIndent);
 				    	gridIndex = gridIndex + (beigeTabMove[0] * forwardIndent);
 				        break;
 				    case Black:
 				    	tmp = colorsInstructions.get("Black");
-				    	
+
 				    	forwardIndent = setForwardIndent(blackTabMove, forwardIndent);
 				    	gridIndex = gridIndex + (blackTabMove[0] * forwardIndent);
 				        break;
 				    case Green:
 				    	tmp = colorsInstructions.get("Green");
-				    	
+
 				    	forwardIndent = setForwardIndent(greenTabMove, forwardIndent);
 				    	gridIndex = gridIndex + (greenTabMove[0] * forwardIndent);
 				        break;
@@ -483,7 +483,7 @@ public class GameFragment extends Fragment{
 				    	break;
 				}
 				Log.v(tag, "sendstructure = " + sendStructure);
-				
+
 				if(!(sendStructure.get(sendStructure.size() - 1 ).equals(new Instruction(EInstructionType.Lose)))) {
 					for(int i =0 ; i < tmp.size() ; i++)
 					{			
@@ -497,7 +497,7 @@ public class GameFragment extends Fragment{
 			}
 		}
 	}
-	
+
 	private int[] colorInstruction(LinearLayout ll,String key)
 	{
 		ArrayList<Instruction> colorInstructions = new ArrayList<Instruction>();
@@ -528,13 +528,13 @@ public class GameFragment extends Fragment{
 		}
 		colorsInstructions.put(key, colorInstructions);
 		return moveSequence;
-		
+
 	}
-	
+
 	public int setForwardIndent (int[] tab, int currentForward)
 	{
 		int newForward = currentForward;
-		
+
 		for(int dir = 1 ; dir < tab.length ; dir++) {
 			if(tab[dir] > 0) {
 				for(int occur = 1 ; occur <= tab[dir] ; occur++) {
@@ -571,7 +571,7 @@ public class GameFragment extends Fragment{
 				}	
 			}
 		}
-	
+
 		return newForward;		
 	}
 }
