@@ -110,7 +110,7 @@ public class GameFragment extends Fragment{
 			selectColor.setImageResource(R.drawable.no_color);
 			setColorInChild = 0;
 		}
-		
+		structureMap = mapSelect.getMapStructure();
 ///////////////////////////////////////////////////////////////////////////
 ///////////////////////// Insert Arrow in layout ///////////////////////////
 ///////////////////////////////////////////////////////////////////////////
@@ -218,7 +218,7 @@ public class GameFragment extends Fragment{
 				}
 				else
 				{
-					structureMap = mapSelect.getMapStructure();
+					
 					switch(setColorInChild) 
 					{
 				    case R.color.dark_blue:
@@ -417,7 +417,7 @@ public class GameFragment extends Fragment{
 		Toast.makeText(getActivity(), "3 mouvements max par couleur", Toast.LENGTH_SHORT).show();
 	}
 	
-	private void sendInstructions() 
+	public void sendInstructions() 
 	{
 		int gridIndex = 0;
 		int forwardIndent = 1;
@@ -438,7 +438,7 @@ public class GameFragment extends Fragment{
 		}
 		
 		gridIndex = startTabMove[0] * forwardIndent;
-		
+		Log.v(tag, "structuremap = " + structureMap);
 		while(gridIndex != 24 || sendStructure.get(sendStructure.size()).equals(new Instruction(EInstructionType.Lose))) {
 			switch(structureMap.get(gridIndex))
 			{
