@@ -1,61 +1,51 @@
 package com.example.wheelbrain.network;
 
-import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
 
-public class ClientManager
+public class ConnectionManager
 {
 	public Socket socket;
 	public InetAddress INetHost;
-	ClientConnectionTask clientTask;
-	IClientManagerListener delegate;
-	SocketInputThread thread;
+	ConnectionTask clientTask;
+	IConnectionManagerListener delegate;
 	
-	private ClientManager()
+	private ConnectionManager()
 	{
 	}
 	
 	private static class Holder
 	{
-		private static ClientManager sInstance = new ClientManager();
+		private static ConnectionManager sInstance = new ConnectionManager();
 	}
 	
-	public static ClientManager getInstance()
+	public static ConnectionManager getInstance()
 	{
 		return Holder.sInstance;
 	}
 	
-	public void tryConnection(IClientManagerListener _delegate)
+	public void tryConnection(IConnectionManagerListener _delegate)
 	{
 		delegate = _delegate;
-		new ClientConnectionTask().execute();
+		new ConnectionTask().execute();
 	}
 	
 	public void closeConnection()
 	{
-		try
+		if(socket != null && socket.isConnected())
 		{
-			if(socket.isConnected())
-			{
-				socket.close();
-			}
+			RequestManager.getInstance().close();
 			if(delegate != null)
 			{
 				delegate.onConnectionClosed();
 			}
 		}
-		catch (IOException e)
-		{
-			e.printStackTrace();
-		}
 	}
 	
 	public void setSocket(Socket client)
 	{
-		
 		socket = client;
-		thread = new SocketInputThread(socket,delegate);
+		RequestManager.getInstance().initConnection();
 		
 		if(delegate != null)
 		{
