@@ -2,6 +2,7 @@ package com.example.wheellight;
 
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
 
 public class TutorielActivity extends FragmentActivity {
 	
@@ -21,5 +22,20 @@ public class TutorielActivity extends FragmentActivity {
 	
 	}
 	
+	/**
+	 * Quit application when the user press back button in MainFragment
+	 */
+		@Override
+		public void onBackPressed()
+		{
+			super.onBackPressed();
+			FragmentManager fm = getSupportFragmentManager();
+			int count = fm.getBackStackEntryCount();	
+		    if(count == 0)
+		    {
+		    	finish();
+		    }		
+		}	
+		
 
 }

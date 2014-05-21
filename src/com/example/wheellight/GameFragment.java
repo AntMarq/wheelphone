@@ -13,7 +13,6 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -112,16 +111,25 @@ public class GameFragment extends Fragment{
 			selectColor.setImageResource(R.drawable.no_color);
 			setColorInChild = 0;
 		}
+		/**
+		 * Load map structure in DB
+		 */
 		structureMap = mapSelect.getMapStructure();
 		
+///////////////////////////////////////////////////////////////////////////
+///////////////////// Show Tutorial Fragment  /////////////////////////////
+///////////////////////////////////////////////////////////////////////////	
 		
 		helpButton = (ImageButton)view.findViewById(R.id.helpButton);
 		helpButton.setOnClickListener(new OnClickListener() {
 			
 			@Override
 			public void onClick(View v) {
-				TutorielFragment gameFragment = new TutorielFragment();  
-					
+				/**
+				 * Save map before 
+				 */
+				saveMapInGridView();
+				TutorielFragment gameFragment = new TutorielFragment();  			
 		        getFragmentManager().beginTransaction()
 		                .replace(R.id.mainfragment, gameFragment)
 		                .addToBackStack(null)
@@ -224,11 +232,14 @@ public class GameFragment extends Fragment{
 			
 			@Override
 			public void onClick(View v) {
+				
 				Dialog dialog = new ColorPickerDialog(getActivity(),listener);			
 				dialog.show();
 			}
 		});  
-		
+/**
+ * 	GridView adapter && selectColor		
+ */
 		gridview = (GridView)view.findViewById(R.id.game_gridview);
 		adapter = new MapGridViewAdapter(getActivity().getApplicationContext(), size, mapSelect);
 		gridview.setDrawingCacheEnabled(true);
@@ -238,13 +249,11 @@ public class GameFragment extends Fragment{
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view,int position, long id) {
 				
-				if(position == 0 || position == 24)
-				{
+				if(position == 0 || position == 24){
 					//nothing
 				}
 				else
-				{
-					
+				{	
 					switch(setColorInChild) 
 					{
 				    case R.color.dark_blue:
@@ -433,6 +442,10 @@ public class GameFragment extends Fragment{
 		Toast.makeText(getActivity(), nbre_arrowmax + " mouvements max par couleur", Toast.LENGTH_SHORT).show();
 	}
 	
+///////////////////////////////////////////////////////////////////////////
+/////////////////////Algorythm : Itinirate robot roadmap  /////////////////
+///////////////////////////////////////////////////////////////////////////
+
 	public void sendInstructions() 
 	{
 		gridIndex = 0;
@@ -470,8 +483,7 @@ public class GameFragment extends Fragment{
 					lose = true;
 					break;
 				}
-			}
-			
+			}			
 			//Path		
 			while(gridIndex != 24 && lose == false) {
 				Log.d(tag, "gridIndex = " + gridIndex);
@@ -508,7 +520,6 @@ public class GameFragment extends Fragment{
 					} else {
 						for(int i = 0 ; i < tmp.size() ; i++)
 						{	
-							Log.v(tag, "for");
 							if(responseArray.get(i).equals("OK")) {
 								sendStructure.add(tmp.get(i));
 							} else {
@@ -522,8 +533,7 @@ public class GameFragment extends Fragment{
 				} else {
 					Log.v(tag, "Sortie du while");
 					break;
-				}
-				
+				}			
 				if(gridIndex == 24) {
 					Log.v(tag, "WIN !");
 					sendStructure.add(new Instruction(EInstructionType.Win));
@@ -531,7 +541,12 @@ public class GameFragment extends Fragment{
 			}
 		}
 	}
-	
+	/**
+	 * Get Instructions in LinearLayout
+	 * @param ll
+	 * @param key
+	 * @return
+	 */
 	private ArrayList<Integer> getColorInstructions(LinearLayout ll,String key)
 	{
 		ArrayList<Instruction> colorInstructions = new ArrayList<Instruction>();
@@ -565,7 +580,11 @@ public class GameFragment extends Fragment{
 		return moveSequence;
 		
 	}
-	
+	/**
+	 * Check move is valid
+	 * @param moveSequence
+	 * @return
+	 */
 	public ArrayList<String> checkMove (ArrayList<Integer> moveSequence)
 	{
 		ArrayList<String> responseArray = new ArrayList<String>();
