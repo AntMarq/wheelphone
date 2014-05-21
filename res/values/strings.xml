@@ -15,6 +15,14 @@
     <string name="obstacle">Case Obstacle</string>
     <string name="neutre">Case Neutre</string>
     
+    <string name="welcome">Bienvenue dans l\'application Wheel Robot</string>
+    <string name="Jouer">Jouer</string>
+    <string name="Demo">Démonstration</string>
+    <string name="Tutoriel">Tutoriel</string>
+    
+    <string name="play_msg">Cette fonctionnalité est en cours de développement</string>
+    
+    
     
     
     

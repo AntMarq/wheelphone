@@ -3,6 +3,8 @@ package com.example.adapter;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.example.wheellight.R;
+
 import android.content.Context;
 import android.graphics.Color;
 import android.view.View;
@@ -41,7 +43,11 @@ public class ColorPickerAdapter extends BaseAdapter {
 		} else {
 			imageView = (ImageView) convertView;
 		}
-
+		if(position == 0)
+		{
+			imageView.setImageResource(R.drawable.search_noarrow);
+			imageView.setPadding(0, 0, 0, 0);
+		}
 		imageView.setBackgroundColor(colorList.get(position));
 		imageView.setId(position);
 

@@ -7,7 +7,7 @@ import android.support.v4.app.FragmentManager;
 import android.util.Log;
 import android.view.Menu;
 
-public class MainActivity extends FragmentActivity 
+public class DemoActivity extends FragmentActivity 
 {
 
 	@Override
