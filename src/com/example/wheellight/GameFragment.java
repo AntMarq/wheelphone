@@ -59,7 +59,7 @@ public class GameFragment extends Fragment{
 	private int setColorInChild;
 	private LinearLayout blueLinear, greenLinear, beigeLinear, blackLinear,startLinear;
 	private ImageView image;
-	private ArrayList<Instruction> moveArray;
+
 	HashMap<String, ArrayList<Instruction>> colorsInstructions = new HashMap<String, ArrayList<Instruction>>();
 	ArrayList<TypeOfCell> structureMap;
 	ArrayList<Instruction> sendStructure;
@@ -73,7 +73,7 @@ public class GameFragment extends Fragment{
 	{
 		Log.v(tag, "onCreateView");
 		
-		View view = inflater.inflate(getResources().getLayout(R.layout.test), container, false);
+		View view = inflater.inflate(getResources().getLayout(R.layout.game_fragment), container, false);
 		setHasOptionsMenu(true);
 		db = WheelDatabase.getInstance(getActivity().getApplicationContext());
 		sh_Pref = getActivity().getSharedPreferences("WheelLight", 0);		
@@ -413,7 +413,6 @@ public class GameFragment extends Fragment{
 	{
 		gridIndex = 0;
 		curDirection = 1;
-		
 		boolean lose = false;
 		ArrayList<Instruction> tmp;
 		ArrayList<String> responseArray = new ArrayList<String>();
@@ -421,23 +420,17 @@ public class GameFragment extends Fragment{
 		sendStructure = new ArrayList<Instruction>();
 		
 		ArrayList<Integer> startTabMove = getColorInstructions(startLinear,"Start");
-		//Log.v(tag, "startTabMove = {" + startTabMove.get(0) + ", " + startTabMove.get(1) + ", " + startTabMove.get(2) + "}");
 		ArrayList<Integer> blueTabMove = getColorInstructions(blueLinear,"Blue");
-		//Log.v(tag, "blueTabMove  = {" + blueTabMove.get(0) + ", " + blueTabMove.get(1) + ", " + blueTabMove.get(2) + "}");
 		ArrayList<Integer> greenTabMove = getColorInstructions(greenLinear,"Green");
-		//Log.v(tag, "greenTabMove = {" + greenTabMove.get(0) + ", " + greenTabMove.get(1) + "}");
 		ArrayList<Integer> blackTabMove = getColorInstructions(blackLinear,"Black");
-		//Log.v(tag, "blackTabMove = {" + blackTabMove.get(0) + ", " + blackTabMove.get(1) + "}");
 		ArrayList<Integer> beigeTabMove = getColorInstructions(beigeLinear,"Beige");
-		//Log.v(tag, "beigeTabMove = {" + beigeTabMove.get(0) + ", " + beigeTabMove.get(1) + ", " + beigeTabMove.get(2) + "}");
 		
 		//Start
 		sendStructure.add(new Instruction(EInstructionType.Start));		
 		tmp = colorsInstructions.get("Start");
 		responseArray = checkMove(startTabMove);
 		
-		if(tmp.size() <= 0) {
-			
+		if(tmp.size() <= 0) {			
 			Log.v(tag, "LOSE at start !");
 			sendStructure.add(new Instruction(EInstructionType.Lose));
 			lose = true;
@@ -455,8 +448,7 @@ public class GameFragment extends Fragment{
 				}
 			}
 			
-			//Path
-			
+			//Path		
 			while(gridIndex != 24 && lose == false) {
 				Log.d(tag, "gridIndex = " + gridIndex);
 				switch(structureMap.get(gridIndex))
@@ -464,22 +456,18 @@ public class GameFragment extends Fragment{
 					case Blue:
 						tmp = colorsInstructions.get("Blue");
 						responseArray = checkMove(blueTabMove);
-						//gridIndex = gridIndex + (blueTabMove[0] * forwardIndent);
 				        break;
 				    case Beige:
 				    	tmp = colorsInstructions.get("Beige");
 				    	responseArray = checkMove(beigeTabMove);
-				    	//gridIndex = gridIndex + (beigeTabMove[0] * forwardIndent);
 				        break;
 				    case Black:
 				    	tmp = colorsInstructions.get("Black");
 				    	responseArray = checkMove(blackTabMove);
-				    	//gridIndex = gridIndex + (blackTabMove[0] * forwardIndent);
 				        break;
 				    case Green:
 				    	tmp = colorsInstructions.get("Green");
 				    	responseArray = checkMove(greenTabMove);
-				    	//gridIndex = gridIndex + (greenTabMove[0] * forwardIndent);
 				        break;
 				    default:
 				    	Log.v(tag, "LOSE in game !");
@@ -487,8 +475,7 @@ public class GameFragment extends Fragment{
 				    	lose = true;
 				    	break;
 				}
-				
-				
+								
 				if(lose == false) {
 					if(tmp.size() == 0) {
 						Log.v(tag, "LOSE no instruction set !");
@@ -505,8 +492,7 @@ public class GameFragment extends Fragment{
 								sendStructure.add(new Instruction(EInstructionType.Lose));
 								lose = true;
 								break;
-							}
-							
+							}						
 						}
 					}
 				} else {
