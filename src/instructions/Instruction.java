@@ -68,4 +68,9 @@ public class Instruction
 		}
 		return json;
 	}
+
+	@Override
+	public String toString() {
+		return ""+type;
+	}
 }

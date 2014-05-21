@@ -64,6 +64,10 @@ public class GameFragment extends Fragment{
 	ArrayList<TypeOfCell> structureMap;
 	ArrayList<Instruction> sendStructure;
 	
+	int gridIndex = 0;
+	//curDirection  1 = right | 2 = down | 3 = up | 4 = left
+	int curDirection = 1;
+	
 	
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
 	{
@@ -99,7 +103,7 @@ public class GameFragment extends Fragment{
 		up = (ImageButton)view.findViewById(R.id.imageButtonUp);
 		right = (ImageButton)view.findViewById(R.id.imageButtonRight);
 
-		userInfo.setText(Html.fromHtml("Selectionner une couleur en cliquant sur le pot de peinture <br /><br /> Remplisser la grille avec la couleur de votre choix <br /><br /> &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp et/ou <br /><br /> Saisisser la s�quence de mouvement en fonction de la couleur selectionn�e"));
+		userInfo.setText(Html.fromHtml("Selectionner une couleur en cliquant sur le pot de peinture <br /><br /> Remplisser la grille avec la couleur de votre choix <br /><br /> &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp et/ou <br /><br /> Saisisser la squence de mouvement en fonction de la couleur selectionne"));
 		userInfo.setBackgroundColor(getResources().getColor(R.color.white));
 		
 		if(selectColor.getBackground() != null)
@@ -252,18 +256,9 @@ public class GameFragment extends Fragment{
 			public void onClick(View v) {
 				
 				sendInstructions();
-				/*	
-				moveArray = new ArrayList<Instruction>();
-				moveArray.add(new Instruction(EInstructionType.Start));
-				moveArray.add(new Instruction(EInstructionType.Forward));
-				moveArray.add(new Instruction(EInstructionType.Forward));
-				moveArray.add(new Instruction(EInstructionType.Left));
-				moveArray.add(new Instruction(EInstructionType.Forward));
-				moveArray.add(new Instruction(EInstructionType.Forward));
-				moveArray.add(new Instruction(EInstructionType.Right));
-				moveArray.add(new Instruction(EInstructionType.Forward));
-				moveArray.add(new Instruction(EInstructionType.Win));
-				*/
+					
+				Log.v(tag, "sendStructure = " + sendStructure.toString());
+				
 				Connectivity_Fragment gameFragment = new Connectivity_Fragment();  
 				Bundle bdl = new Bundle();
 				bdl.putSerializable("instruction", sendStructure);
@@ -301,7 +296,7 @@ public class GameFragment extends Fragment{
 		else
 		{
 			mapSelect = db.getSelectMap(1);
-			Toast.makeText(getActivity().getApplicationContext(), "map par defaut charg�e", Toast.LENGTH_SHORT).show();
+			Toast.makeText(getActivity().getApplicationContext(), "map par defaut charge", Toast.LENGTH_SHORT).show();
 		}
 	}
 	
@@ -396,7 +391,7 @@ public class GameFragment extends Fragment{
 		}
 		else
 		{
-			Toast.makeText(getActivity(), "S�lectionner une couleur et cliquer sur une fl�che", Toast.LENGTH_SHORT).show();
+			Toast.makeText(getActivity(), "Slectionner une couleur et cliquer sur une flche", Toast.LENGTH_SHORT).show();
 		}
 	}
 	
@@ -416,80 +411,109 @@ public class GameFragment extends Fragment{
 	
 	public void sendInstructions() 
 	{
-		int gridIndex = 0;
-		int forwardIndent = 1;
+		gridIndex = 0;
+		curDirection = 1;
+		
+		boolean lose = false;
+		ArrayList<Instruction> tmp;
+		ArrayList<String> responseArray = new ArrayList<String>();
+		
 		sendStructure = new ArrayList<Instruction>();
-
-		int[] startTabMove = colorInstruction(startLinear,"Start");
-		Log.v(tag, "startTabMove = {" + startTabMove[0] + ", " + startTabMove[1] + ", " + startTabMove[2] + "}");
-		int[] blueTabMove = colorInstruction(blueLinear,"Blue");
-		Log.v(tag, "blueTabMove = {" + blueTabMove[0] + ", " + blueTabMove[1] + ", " + blueTabMove[2] + "}");
-		int[] greenTabMove = colorInstruction(greenLinear,"Green");
-		Log.v(tag, "greenTabMove = {" + greenTabMove[0] + ", " + greenTabMove[1] + ", " + greenTabMove[2] + "}");
-		int[] blackTabMove = colorInstruction(blackLinear,"Black");
-		Log.v(tag, "blackTabMove = {" + blackTabMove[0] + ", " + blackTabMove[1] + ", " + blackTabMove[2] + "}");
-		int[] beigeTabMove = colorInstruction(beigeLinear,"Beige");
-		Log.v(tag, "beigeTabMove = {" + beigeTabMove[0] + ", " + beigeTabMove[1] + ", " + beigeTabMove[2] + "}");
-
+		
+		ArrayList<Integer> startTabMove = getColorInstructions(startLinear,"Start");
+		//Log.v(tag, "startTabMove = {" + startTabMove.get(0) + ", " + startTabMove.get(1) + ", " + startTabMove.get(2) + "}");
+		ArrayList<Integer> blueTabMove = getColorInstructions(blueLinear,"Blue");
+		//Log.v(tag, "blueTabMove  = {" + blueTabMove.get(0) + ", " + blueTabMove.get(1) + ", " + blueTabMove.get(2) + "}");
+		ArrayList<Integer> greenTabMove = getColorInstructions(greenLinear,"Green");
+		//Log.v(tag, "greenTabMove = {" + greenTabMove.get(0) + ", " + greenTabMove.get(1) + "}");
+		ArrayList<Integer> blackTabMove = getColorInstructions(blackLinear,"Black");
+		//Log.v(tag, "blackTabMove = {" + blackTabMove.get(0) + ", " + blackTabMove.get(1) + "}");
+		ArrayList<Integer> beigeTabMove = getColorInstructions(beigeLinear,"Beige");
+		//Log.v(tag, "beigeTabMove = {" + beigeTabMove.get(0) + ", " + beigeTabMove.get(1) + ", " + beigeTabMove.get(2) + "}");
+		
 		//Start
 		sendStructure.add(new Instruction(EInstructionType.Start));		
-		ArrayList<Instruction> tmp = colorsInstructions.get("Start");
-		Log.v(tag, "tmp = " + tmp.size());
-
+		tmp = colorsInstructions.get("Start");
+		responseArray = checkMove(startTabMove);
+		
 		if(tmp.size() <= 0) {
-
-			Log.v(tag, "LOSE !");
+			
+			Log.v(tag, "LOSE at start !");
 			sendStructure.add(new Instruction(EInstructionType.Lose));
-
+			lose = true;
+			
 		} else {
 			for(int i = 0 ; i < tmp.size() ; i++)
 			{			
-				sendStructure.add(tmp.get(i));
+				if(responseArray.get(i).equals("OK")) {
+					sendStructure.add(tmp.get(i));
+				} else {
+					Log.v(tag, "LOSE during start move !");
+					sendStructure.add(new Instruction(EInstructionType.Lose));
+					lose = true;
+					break;
+				}
 			}
-
-			gridIndex = startTabMove[0] * forwardIndent;
-
-			Log.v(tag, "structuremap = " + structureMap);
-			while(gridIndex != 24 || sendStructure.get(sendStructure.size() - 1).equals(new Instruction(EInstructionType.Lose))) {
+			
+			//Path
+			
+			while(gridIndex != 24 && lose == false) {
+				Log.d(tag, "gridIndex = " + gridIndex);
 				switch(structureMap.get(gridIndex))
 				{
 					case Blue:
 						tmp = colorsInstructions.get("Blue");
-
-						forwardIndent = setForwardIndent(blueTabMove, forwardIndent);
-						gridIndex = gridIndex + (blueTabMove[0] * forwardIndent);
+						responseArray = checkMove(blueTabMove);
+						//gridIndex = gridIndex + (blueTabMove[0] * forwardIndent);
 				        break;
 				    case Beige:
 				    	tmp = colorsInstructions.get("Beige");
-
-				    	forwardIndent = setForwardIndent(beigeTabMove, forwardIndent);
-				    	gridIndex = gridIndex + (beigeTabMove[0] * forwardIndent);
+				    	responseArray = checkMove(beigeTabMove);
+				    	//gridIndex = gridIndex + (beigeTabMove[0] * forwardIndent);
 				        break;
 				    case Black:
 				    	tmp = colorsInstructions.get("Black");
-
-				    	forwardIndent = setForwardIndent(blackTabMove, forwardIndent);
-				    	gridIndex = gridIndex + (blackTabMove[0] * forwardIndent);
+				    	responseArray = checkMove(blackTabMove);
+				    	//gridIndex = gridIndex + (blackTabMove[0] * forwardIndent);
 				        break;
 				    case Green:
 				    	tmp = colorsInstructions.get("Green");
-
-				    	forwardIndent = setForwardIndent(greenTabMove, forwardIndent);
-				    	gridIndex = gridIndex + (greenTabMove[0] * forwardIndent);
+				    	responseArray = checkMove(greenTabMove);
+				    	//gridIndex = gridIndex + (greenTabMove[0] * forwardIndent);
 				        break;
 				    default:
-				    	Log.v(tag, "LOSE !");
+				    	Log.v(tag, "LOSE in game !");
 				    	sendStructure.add(new Instruction(EInstructionType.Lose));
+				    	lose = true;
 				    	break;
 				}
-				Log.v(tag, "sendstructure = " + sendStructure);
-
-				if(!(sendStructure.get(sendStructure.size() - 1 ).equals(new Instruction(EInstructionType.Lose)))) {
-					for(int i =0 ; i < tmp.size() ; i++)
-					{			
-						sendStructure.add(tmp.get(i));
+				
+				
+				if(lose == false) {
+					if(tmp.size() == 0) {
+						Log.v(tag, "LOSE no instruction set !");
+						sendStructure.add(new Instruction(EInstructionType.Lose));
+						lose = true;
+					} else {
+						for(int i = 0 ; i < tmp.size() ; i++)
+						{	
+							Log.v(tag, "for");
+							if(responseArray.get(i).equals("OK")) {
+								sendStructure.add(tmp.get(i));
+							} else {
+								Log.v(tag, "LOSE during move !");
+								sendStructure.add(new Instruction(EInstructionType.Lose));
+								lose = true;
+								break;
+							}
+							
+						}
 					}
+				} else {
+					Log.v(tag, "Sortie du while");
+					break;
 				}
+				
 				if(gridIndex == 24) {
 					Log.v(tag, "WIN !");
 					sendStructure.add(new Instruction(EInstructionType.Win));
@@ -497,12 +521,13 @@ public class GameFragment extends Fragment{
 			}
 		}
 	}
-
-	private int[] colorInstruction(LinearLayout ll,String key)
+	
+	private ArrayList<Integer> getColorInstructions(LinearLayout ll,String key)
 	{
 		ArrayList<Instruction> colorInstructions = new ArrayList<Instruction>();
 		int childCount = ll.getChildCount();
-		int [] moveSequence = {0,0,0};
+		// 0 = forward | 1 = left | 2 = right
+		ArrayList<Integer> moveSequence = new ArrayList<Integer>();
 		if(childCount > 0)
 		{	
 			for(int i = 0 ; i<childCount; i++)
@@ -512,66 +537,118 @@ public class GameFragment extends Fragment{
 				if(up.getDrawable() == drw)
 				{
 					colorInstructions.add(new Instruction(EInstructionType.Forward));
-					moveSequence[0]++;
+					moveSequence.add(0);
 				}
 				else if(left.getDrawable() == drw)
 				{
 					colorInstructions.add(new Instruction(EInstructionType.Left));
-					moveSequence[1]++;
+					moveSequence.add(1);
 				}
 				else
 				{
 					colorInstructions.add(new Instruction(EInstructionType.Right));
-					moveSequence[2]++;
+					moveSequence.add(2);
 				}	
 			}
 		}
 		colorsInstructions.put(key, colorInstructions);
 		return moveSequence;
-
+		
 	}
-
-	public int setForwardIndent (int[] tab, int currentForward)
+	
+	public ArrayList<String> checkMove (ArrayList<Integer> moveSequence)
 	{
-		int newForward = currentForward;
-
-		for(int dir = 1 ; dir < tab.length ; dir++) {
-			if(tab[dir] > 0) {
-				for(int occur = 1 ; occur <= tab[dir] ; occur++) {
-				switch(currentForward) {
-					case -1:
-						if(dir == 1){
-							newForward = 5;
-						} else {
-							newForward = -5;
-						}
+		ArrayList<String> responseArray = new ArrayList<String>();
+		int x = gridIndex % 5;
+		int y = gridIndex / 5;
+		
+		Log.d(tag, "x = " + x + " | y = " + y);
+		
+		if(moveSequence.size() == 0) {
+			responseArray.add("no instruction");
+		} else {
+			for(int i = 0 ; i < moveSequence.size() ; i++) {
+				if(moveSequence.get(i) == 0) { // forward
+					Log.v(tag, "forward");
+					
+					switch(curDirection) {
+					case 1 :
+						x++;
 						break;
-					case 1:
-						if(dir == 1){
-							newForward = -5;
-						} else {
-							newForward = 5;
-						}
+					case 2 :
+						y++;
 						break;
-					case -5:
-						if(dir == 1){
-							newForward = -1;
-						} else {
-							newForward = 1;
-						}
+					case 3 :
+						y--;
 						break;
-					case 5:
-						if(dir == 1){
-							newForward = 1;
-						} else {
-							newForward = -1;
-						}
+					case 4 :
+						x--;
 						break;
 					}
-				}	
+					
+					if(x > 4 || x < 0 || y > 4 || y < 0) {
+						Log.v(tag, "out of map");
+						responseArray.add("out of map");
+						break;
+					} else {
+						gridIndex = x + (y * 5);
+						Log.v(tag, "gridIndex after move : " + gridIndex);
+						
+						if(structureMap.get(gridIndex) == TypeOfCell.Red) {
+							Log.d(tag, "isRed : " + (structureMap.get(gridIndex) == TypeOfCell.Red));
+							responseArray.add("trap");
+							break;
+						} else {
+							Log.v(tag, "OK");
+							responseArray.add("OK");
+						}
+					}
+				} else {
+					Log.v(tag, "turn");
+					responseArray.add("OK");
+					curDirection = getCurDirection(moveSequence.get(i));
+				}
 			}
 		}
-
-		return newForward;		
+	
+		return responseArray;		
+	}
+	
+	public int getCurDirection(int side) {
+		int _curDirection = 0;
+		
+		if(side == 1) { // left
+			switch(curDirection) {
+			case 1 :
+				_curDirection = 3;
+				break;
+			case 2 :
+				_curDirection = 1;
+				break;
+			case 3 :
+				_curDirection = 4;
+				break;
+			case 4 :
+				_curDirection = 2;
+				break;
+			}
+		} else { // rigth
+			switch(curDirection) {
+			case 1 :
+				_curDirection = 2;
+				break;
+			case 2 :
+				_curDirection = 4;
+				break;
+			case 3 :
+				_curDirection = 1;
+				break;
+			case 4 :
+				_curDirection = 3;
+				break;
+			}
+		}
+		
+		return _curDirection;
 	}
 }
