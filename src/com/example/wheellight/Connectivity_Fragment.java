@@ -1,11 +1,9 @@
 package com.example.wheellight;
 
-import instructions.Instruction;
-import instructions.Instruction.EInstructionType;
-
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
@@ -23,6 +21,7 @@ import android.net.wifi.p2p.WifiP2pManager.Channel;
 import android.net.wifi.p2p.WifiP2pManager.ConnectionInfoListener;
 import android.net.wifi.p2p.WifiP2pManager.PeerListListener;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -35,12 +34,14 @@ import android.widget.TextView;
 
 import com.example.wheellight.network.ConnectionManager;
 import com.example.wheellight.network.IConnectionManagerListener;
+import com.example.wheellight.network.IRequestListener;
 import com.example.wheellight.network.IWifiP2PListener;
 import com.example.wheellight.network.RequestManager;
 import com.example.wheellight.network.WiFiDirectBroadcastReceiver;
 
 
-public class Connectivity_Fragment extends Fragment implements IWifiP2PListener, PeerListListener, IConnectionManagerListener, ConnectionInfoListener 
+public class Connectivity_Fragment extends Fragment implements 
+IWifiP2PListener, PeerListListener, IConnectionManagerListener, ConnectionInfoListener, IRequestListener
 {
 	
 	WifiP2pManager mManager;
@@ -57,12 +58,12 @@ public class Connectivity_Fragment extends Fragment implements IWifiP2PListener,
 	boolean isWifiEnabled = false;
 	boolean isWifiPaired = false;
 	boolean isConnecting = false;
-	boolean isConnected = false;
 	
 	WifiP2pInfo info;
 	
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
 	{
+		RequestManager.getInstance().delegate = this;
 		View view = inflater.inflate(getResources().getLayout(R.layout.connectivity_fragment), container, false);
 		context = (WheelLightApp) getActivity().getApplicationContext();
 		Bundle b = getArguments();
@@ -120,7 +121,7 @@ public class Connectivity_Fragment extends Fragment implements IWifiP2PListener,
 
 	public void onWifiP2PEnable()
 	{
-		if(isConnected)
+		if(RequestManager.getInstance().isInit())
 			return;
 		
 		if(info != null && info.groupFormed)
@@ -138,7 +139,7 @@ public class Connectivity_Fragment extends Fragment implements IWifiP2PListener,
 			{
 				_dialog.dismiss();
 				if(dialogCount == 0)
-					getFragmentManager().popBackStackImmediate();
+					requestQuit();
 			}
 		});
 		
@@ -172,7 +173,7 @@ public class Connectivity_Fragment extends Fragment implements IWifiP2PListener,
 			{
 				_dialog.dismiss();
 				if(dialogCount == 0)
-					getFragmentManager().popBackStackImmediate();
+					requestQuit();
 			}
 		});
 	}
@@ -180,7 +181,7 @@ public class Connectivity_Fragment extends Fragment implements IWifiP2PListener,
 	@Override
 	public void onPeersAvailable(WifiP2pDeviceList _peers)
 	{	
-		if(isConnected)
+		if(RequestManager.getInstance().isInit())
 			return;
 		
 		if(info != null && info.groupFormed || isConnecting)
@@ -207,7 +208,7 @@ public class Connectivity_Fragment extends Fragment implements IWifiP2PListener,
 	
 	public void openConnectionWithDevice(final WifiP2pDevice _device)
 	{
-		if(isConnected)
+		if(RequestManager.getInstance().isInit())
 			return;
 		
 		isConnecting = true;
@@ -228,7 +229,7 @@ public class Connectivity_Fragment extends Fragment implements IWifiP2PListener,
 			{
 				_dialog.dismiss();
 				if(dialogCount == 0)
-					getFragmentManager().popBackStackImmediate();
+					requestQuit();
 			}
 		});
 		
@@ -253,11 +254,12 @@ public class Connectivity_Fragment extends Fragment implements IWifiP2PListener,
 	@Override
 	public void onConnectionInfoAvailable(final WifiP2pInfo _info)
 	{
-		if(isConnected)
+		if(RequestManager.getInstance().isInit())
 			return;
 		
 		if(isConnecting || info == null)
 		{
+			
 			isConnecting = false;
 			
 		    if (progressDialog != null && progressDialog.isShowing())
@@ -287,7 +289,7 @@ public class Connectivity_Fragment extends Fragment implements IWifiP2PListener,
 					{
 						_dialog.dismiss();
 						if(dialogCount == 0)
-							getFragmentManager().popBackStackImmediate();
+							requestQuit();
 					}
 				});
 			}
@@ -314,12 +316,11 @@ public class Connectivity_Fragment extends Fragment implements IWifiP2PListener,
 	@Override
 	public void onDestroy()
 	{
+		RequestManager.getInstance().delegate = null;
 		super.onDestroy();
-		ConnectionManager.getInstance().closeConnection();
 		isWifiEnabled = false;
 		isWifiPaired = false;
 		isConnecting = false;
-		isConnected = false;
 	}
 
 	private class DeviceP2PAdapter extends BaseAdapter
@@ -393,7 +394,7 @@ public class Connectivity_Fragment extends Fragment implements IWifiP2PListener,
 					_dialog.cancel();
 					dialogCount--;
 					if(!progressDialog.isShowing() && dialogCount == 0)
-						getFragmentManager().popBackStackImmediate();
+						requestQuit();
 				}
 			});
 		}
@@ -433,19 +434,14 @@ public class Connectivity_Fragment extends Fragment implements IWifiP2PListener,
 		builder.show();
 	}
 	
-	void onBackPressed()
-	{
-		
-	}
 
 	@Override
 	public void onConnectionOpened()
 	{
-		isConnected = true;
 		if(progressDialog != null && progressDialog.isShowing())
 			progressDialog.dismiss();
 		
-		progressDialog = ProgressDialog.show(getActivity(), "Socket", "Socket is opened. Feel free to transfer data.", true);
+		progressDialog = ProgressDialog.show(getActivity(), "Socket", "Sending informations to client.", true);
 		progressDialog.setCancelable(true);
 		progressDialog.setOnCancelListener(new OnCancelListener()
 		{
@@ -454,22 +450,15 @@ public class Connectivity_Fragment extends Fragment implements IWifiP2PListener,
 			{
 				_dialog.dismiss();
 				if(dialogCount == 0)
-					getFragmentManager().popBackStackImmediate();
+					requestQuit();
 			}
 		});
-		
-		ArrayList<Instruction> instrus = new ArrayList<Instruction>();
-		instrus.add(new Instruction(EInstructionType.Start));
-		instrus.add(new Instruction(EInstructionType.Forward));
-		instrus.add(new Instruction(EInstructionType.Left));
-		
-		RequestManager.getInstance().sendInstructions(instrus);
+		RequestManager.getInstance().sendWelcome();
 	}
 
 	@Override
 	public void onConnectionClosed()
 	{
-		isConnected = false;
 		if(progressDialog != null && progressDialog.isShowing())
 			progressDialog.dismiss();
 	}
@@ -478,5 +467,84 @@ public class Connectivity_Fragment extends Fragment implements IWifiP2PListener,
 	public void resetP2pState()
 	{
 		clearPeers();
+	}
+	
+	public void requestQuit()
+	{
+		if(RequestManager.getInstance().isInit())
+		{
+			progressDialog = ProgressDialog.show(getActivity(), "Closing", "Closing connection.", true);
+			progressDialog.setCancelable(true);
+			progressDialog.setOnCancelListener(new OnCancelListener()
+			{
+				@Override
+				public void onCancel(DialogInterface _dialog)
+				{
+					goBack();
+				}
+			});
+			RequestManager.getInstance().disconnect();
+		}
+		else
+			goBack();
+	}
+	
+	private void goBack()
+	{
+		if(progressDialog != null && progressDialog.isShowing())
+			progressDialog.dismiss();
+		
+		getFragmentManager().popBackStackImmediate();
+	}
+
+	@Override
+	public void onFarewellSent()
+	{
+		getActivity().runOnUiThread(new Runnable()
+		{
+		    public void run()
+		    {
+		        goBack();
+		    }
+		});
+	}
+
+	@Override
+	public void onWelcomeReceived()
+	{
+		getActivity().runOnUiThread(new Runnable()
+		{
+		    public void run()
+		    {
+		    	if(progressDialog != null && progressDialog.isShowing())
+					progressDialog.dismiss();
+				
+				progressDialog = ProgressDialog.show(getActivity(), "Playing", "Now playing.", true);
+				progressDialog.setCancelable(true);
+				progressDialog.setOnCancelListener(new OnCancelListener()
+				{
+					@Override
+					public void onCancel(DialogInterface _dialog)
+					{
+						_dialog.dismiss();
+						if(dialogCount == 0)
+							requestQuit();
+					}
+				});
+		    }
+		});
+	
+	}
+
+	@Override
+	public void onFarewellReceived()
+	{
+		getActivity().runOnUiThread(new Runnable()
+		{
+		    public void run()
+		    {
+		        goBack();
+		    }
+		});
 	}
 }

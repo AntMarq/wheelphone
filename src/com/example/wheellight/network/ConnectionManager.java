@@ -16,13 +16,12 @@ public class ConnectionManager
 	
 	private ConnectionManager()
 	{
-		try
+		/*try
 		{
-			serverSocket = new ServerSocket(8765);
 		} catch (IOException e)
 		{
 			e.printStackTrace();
-		}
+		}*/
 	}
 	
 	private static class Holder
@@ -37,6 +36,15 @@ public class ConnectionManager
 	
 	public void startListening(IConnectionManagerListener _delegate)
 	{
+		if(serverSocket == null || serverSocket.isClosed())
+			try
+			{
+				serverSocket = new ServerSocket(8765);
+			} catch (IOException e)
+			{
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		delegate = _delegate;
 		
 		if(serverTask != null)
@@ -47,21 +55,10 @@ public class ConnectionManager
 		serverTask.execute();
 	}
 	
-	public void closeConnection()
-	{
-		if(clientSocket != null && clientSocket.isConnected())
-		{
-			RequestManager.getInstance().close();
-			if(delegate != null)
-			{
-				delegate.onConnectionClosed();
-			}
-		}
-	}
-	
 	public void setClient(Socket client)
 	{
 		clientSocket = client;
+
 		RequestManager.getInstance().initConnection();
 
 		if(delegate != null)

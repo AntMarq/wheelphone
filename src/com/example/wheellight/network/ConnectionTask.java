@@ -38,6 +38,8 @@ public class ConnectionTask extends AsyncTask<Void, Void, Void>
     protected void onPostExecute(Void arg)
     {
     	if(success)
+    	{
             ConnectionManager.getInstance().setClient(client);
+    	}
     }
 }

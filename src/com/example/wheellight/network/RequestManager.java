@@ -17,7 +17,7 @@ import com.example.wheellight.network.Request.ERequestType;
 
 public class RequestManager
 {
-	
+	public IRequestListener delegate;
 	
 	/*******************************
 	 * InputThread
@@ -45,8 +45,33 @@ public class RequestManager
 		
 		public void read(String readBuffer)
 		{
-			
+			Request rq = Request.readRequestFromJson(readBuffer);
+			Log.e("received",rq.mType.toString());
+			switch(rq.mType)
+			{
+				case Farewell : readFarewell(rq);
+					break;
+					
+				case Welcome : readWelcome(rq);
+					break;
+					
+				default:
+					break;
+			}
 		}
+		
+		public void readFarewell(Request rq)
+		{
+			if(delegate != null)
+				delegate.onFarewellReceived();
+		}
+		
+		public void readWelcome(Request rq)
+		{
+			if(delegate != null)
+				delegate.onWelcomeReceived();
+		}
+		
 		
 		@Override
 		public void run()
@@ -140,13 +165,14 @@ public class RequestManager
 		
 		private void send(Request request){
 			try{
+				Log.e("sending",request.mType.toString());
 				dos.writeUTF(request.toJson().toString());
 				if(request.mType == ERequestType.Farewell){
 					closing = false;
 					turnOff();
 				}
 			} catch (IOException e) {
-				Log.e("Request Error", "IO Exception while sending request to the server.");
+				Log.e("Request Error", "IO Exception while sending request.");
 				e.printStackTrace();
 			}
 		}
@@ -159,8 +185,10 @@ public class RequestManager
 			}
 		}
 		
-		public void turnOff(){
+		public void turnOff()
+		{
 			running = false;
+			delegate.onFarewellSent();
 		}
 	}
 	
@@ -201,6 +229,7 @@ public class RequestManager
 		try
 		{
 			ConnectionManager.getInstance().clientSocket.close();
+			ConnectionManager.getInstance().serverSocket.close();
 		}
 		catch (IOException e)
 		{
@@ -235,6 +264,7 @@ public class RequestManager
 		try
 		{
 			ConnectionManager.getInstance().clientSocket.close();
+			ConnectionManager.getInstance().serverSocket.close();
 			if(ConnectionManager.getInstance().delegate != null)
 			{
 				ConnectionManager.getInstance().delegate.onConnectionClosed();
@@ -270,5 +300,17 @@ public class RequestManager
 	{
 		Request request = new Request(ERequestType.Instructions, Instruction.instructionsToJson(_instrus).toString());
 		sendRequest(request);
+	}
+	
+	public void sendWelcome()
+	{
+		Request rq = new Request(ERequestType.Welcome, "");
+		sendRequest(rq);
+	}
+	
+	public void sendFarewell()
+	{
+		Request rq = new Request(ERequestType.Farewell , "");
+		sendRequest(rq);
 	}
 }

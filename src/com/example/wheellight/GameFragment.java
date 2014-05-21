@@ -283,7 +283,7 @@ public class GameFragment extends Fragment{
 				ChooseMapFragment chooseMapFragment = new ChooseMapFragment();       
 		        getFragmentManager().beginTransaction()
 		                .replace(R.id.mainfragment, chooseMapFragment)
-		                .addToBackStack(null)
+		                .addToBackStack("connection")
 		                .commit();					
 			}
 		});		

@@ -3,6 +3,7 @@ package com.example.wheellight.network;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+
 public class Request
 {
 	private static long ID_AUTO = 0;
@@ -29,7 +30,7 @@ public class Request
 		mId = ID_AUTO++;
 	}
 	
-	public Request readRequestFromJson(String _json)
+	public static Request readRequestFromJson(String _json)
 	{
 		Request read = new Request();
 		
