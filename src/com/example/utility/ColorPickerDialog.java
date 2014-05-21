@@ -37,7 +37,7 @@ public class ColorPickerDialog extends Dialog {
 		setContentView(R.layout.color_picker);
 		
 		// for convenience and better reading, we place the colors in a two dimension array
-		String colors[][] = {{ "FCDFA6", "AEAEAE", "E64C66", "1BBC9B", "3090DE", "000000" }};
+		String colors[][] = {{ "FFFFFF" , "FCDFA6", "AEAEAE", "E64C66", "1BBC9B", "3090DE", "000000" }};
 
 		final ArrayList<Integer>colorList = new ArrayList<Integer>();
 
@@ -66,21 +66,24 @@ public class ColorPickerDialog extends Dialog {
 		switch(position)
 		{		
 			case 0 :
-				mListener.colorChanged(R.color.beige);
+				mListener.colorChanged(R.color.white);
 			break;
 			case 1 :
-				mListener.colorChanged(R.color.grisclair);
+				mListener.colorChanged(R.color.beige);
 			break;
 			case 2 :
-				mListener.colorChanged(R.color.color_red);
+				mListener.colorChanged(R.color.grisclair);
 			break;
 			case 3 :
-				mListener.colorChanged(R.color.green);
+				mListener.colorChanged(R.color.color_red);
 			break;
 			case 4 :
+				mListener.colorChanged(R.color.green);
+			break;
+			case 5 :
 				mListener.colorChanged(R.color.dark_blue);
 			break;
-			case 5:
+			case 6:
 				mListener.colorChanged(R.color.noir);
 			break;
 				

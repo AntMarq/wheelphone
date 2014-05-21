@@ -63,16 +63,16 @@ public class MapGridViewAdapter extends BaseAdapter{
         switch(enumColor)
 		{
 		 case None:
-			 imageView.setBackgroundColor(Color.GRAY); 		 
+			 imageView.setBackgroundResource(R.color.grisclair); 		 
 			 break;
 		 case Green:
-			 imageView.setBackgroundColor(Color.GREEN);
+			 imageView.setBackgroundResource(R.color.green);
 			 break;
 		 case Black:
-			 imageView.setBackgroundColor(Color.BLACK);
+			 imageView.setBackgroundResource(R.color.noir);
 			 break;
 		 case Blue:
-			 imageView.setBackgroundColor(Color.BLUE);
+			 imageView.setBackgroundResource(R.color.dark_blue);
 			 break;
 		 case Start:
 			 imageView.setBackgroundResource(R.drawable.search);
@@ -80,11 +80,11 @@ public class MapGridViewAdapter extends BaseAdapter{
 		 case End:
 			 imageView.setBackgroundResource(R.drawable.finish_flag);
 			 break;
-		 case Yellow:
-			 imageView.setBackgroundColor(Color.YELLOW);
+		 case Beige:
+			 imageView.setBackgroundResource(R.color.beige);
 			 break;
 		 case Red:
-			 imageView.setBackgroundColor(Color.RED);
+			 imageView.setBackgroundResource(R.color.color_red);
 			 break;
 			 
 		}
