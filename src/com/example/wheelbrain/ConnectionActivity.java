@@ -1,8 +1,9 @@
 package com.example.wheelbrain;
 
+import instructions.Instruction;
+
 import java.util.ArrayList;
 
-import instructions.Instruction;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -10,24 +11,24 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnCancelListener;
+import android.content.Intent;
 import android.content.IntentFilter;
-import android.net.wifi.p2p.WifiP2pDeviceList;
 import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.net.wifi.p2p.WifiP2pManager.Channel;
 import android.net.wifi.p2p.WifiP2pManager.ConnectionInfoListener;
-import android.net.wifi.p2p.WifiP2pManager.PeerListListener;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
-import android.widget.Toast;
 
 import com.example.wheelbrain.network.ConnectionManager;
 import com.example.wheelbrain.network.IConnectionManagerListener;
+import com.example.wheelbrain.network.IRequestListener;
 import com.example.wheelbrain.network.IWifiP2PListener;
+import com.example.wheelbrain.network.RequestManager;
 import com.example.wheelbrain.network.WiFiDirectBroadcastReceiver;
 
-public class ConnectionActivity extends Activity implements IWifiP2PListener, IConnectionManagerListener, PeerListListener, ConnectionInfoListener 
+public class ConnectionActivity extends Activity implements 
+IWifiP2PListener, IConnectionManagerListener, ConnectionInfoListener, IRequestListener
 {
 	WifiP2pManager mManager;
 	Channel mChannel;
@@ -41,6 +42,13 @@ public class ConnectionActivity extends Activity implements IWifiP2PListener, IC
 	WifiP2pInfo info;
 	
 	int dialogCount = 0;
+	
+	@Override
+	public void onStart()
+	{
+		super.onStart();	
+		RequestManager.getInstance().delegate = this;
+	}
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
@@ -84,8 +92,7 @@ public class ConnectionActivity extends Activity implements IWifiP2PListener, IC
 			public void onCancel(DialogInterface _dialog)
 			{
 				_dialog.dismiss();
-				if(dialogCount == 0)
-					getFragmentManager().popBackStackImmediate();
+				onBackPressed();
 			}
 		});
 		
@@ -118,8 +125,7 @@ public class ConnectionActivity extends Activity implements IWifiP2PListener, IC
 			public void onCancel(DialogInterface _dialog)
 			{
 				_dialog.dismiss();
-				if(dialogCount == 0)
-					getFragmentManager().popBackStackImmediate();
+				onBackPressed();
 			}
 		});
 	}
@@ -127,6 +133,9 @@ public class ConnectionActivity extends Activity implements IWifiP2PListener, IC
 	@Override
 	public void onConnectionInfoAvailable(final WifiP2pInfo _info)
 	{
+		if(RequestManager.getInstance().isInit())
+			return;
+		
 		info = _info;
 		
 	    if (progressDialog != null && progressDialog.isShowing())
@@ -151,7 +160,7 @@ public class ConnectionActivity extends Activity implements IWifiP2PListener, IC
 				
 				ConnectionManager.getInstance().INetHost = _info.groupOwnerAddress;
 				ConnectionManager.getInstance().tryConnection(this);
-				progressDialog = ProgressDialog.show(this, "Socket", "Opening socket with the server.", true);
+				progressDialog = ProgressDialog.show(this, "Socket", "Connecting to the server.", true);
 				progressDialog.setCancelable(true);
 				progressDialog.setOnCancelListener(new OnCancelListener()
 				{
@@ -159,8 +168,7 @@ public class ConnectionActivity extends Activity implements IWifiP2PListener, IC
 					public void onCancel(DialogInterface _dialog)
 					{
 						_dialog.dismiss();
-						if(dialogCount == 0)
-							getFragmentManager().popBackStackImmediate();
+						onBackPressed();
 					}
 				});
 			}
@@ -186,7 +194,6 @@ public class ConnectionActivity extends Activity implements IWifiP2PListener, IC
 	public void onDestroy()
 	{
 		super.onDestroy();
-		ConnectionManager.getInstance().closeConnection();
 	}
 	
 	public void showDialog(String _title, String _message, boolean canRetry, boolean shouldLeave)
@@ -206,8 +213,7 @@ public class ConnectionActivity extends Activity implements IWifiP2PListener, IC
 				{
 					_dialog.cancel();
 					dialogCount--;
-					if(!progressDialog.isShowing() && dialogCount == 0)
-						getFragmentManager().popBackStackImmediate();
+					onBackPressed();
 				}
 			});
 		}
@@ -221,6 +227,7 @@ public class ConnectionActivity extends Activity implements IWifiP2PListener, IC
 				{
 					_dialog.cancel();
 					dialogCount--;
+					onBackPressed();
 				}
 			});
 		}
@@ -248,11 +255,11 @@ public class ConnectionActivity extends Activity implements IWifiP2PListener, IC
 
 	@Override
 	public void onConnectionOpened()
-	{
+	{		
 		if(progressDialog != null && progressDialog.isShowing())
 			progressDialog.dismiss();
 		
-		progressDialog = ProgressDialog.show(this, "Socket", "Socket is opened. Feel free to transfer data.", true);
+		progressDialog = ProgressDialog.show(this, "Socket", "Waiting for server instructions.", true);
 		progressDialog.setCancelable(true);
 		progressDialog.setOnCancelListener(new OnCancelListener()
 		{
@@ -260,19 +267,9 @@ public class ConnectionActivity extends Activity implements IWifiP2PListener, IC
 			public void onCancel(DialogInterface _dialog)
 			{
 				_dialog.dismiss();
-				if(dialogCount == 0)
-					getFragmentManager().popBackStackImmediate();
+				onBackPressed();
 			}
 		});
-	}
-
-	@Override
-	public void onConnectionClosed()
-	{
-		if(progressDialog != null && progressDialog.isShowing())
-			progressDialog.dismiss();
-		
-		showDialog("Connection closed", "The connection has been closed", true, true);
 	}
 
 	@Override
@@ -286,9 +283,52 @@ public class ConnectionActivity extends Activity implements IWifiP2PListener, IC
 	}
 
 	@Override
-	public void onPeersAvailable(WifiP2pDeviceList _peers)
+	public void onInstructionReceived(ArrayList<Instruction> _instrus)
 	{
-		// TODO Auto-generated method stub
+	}
+
+	@Override
+	public void onWelcomeReceived()
+	{
+		final Activity act  = this;
+		runOnUiThread(new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				finish();
+				Intent intent = new Intent(act, MainActivity.class);
+				startActivity(intent);
+			}
+		});
+	}
+
+	@Override
+	public void onFarewellReceived()
+	{
+	}
+	
+	@Override 
+	public void onBackPressed()
+	{
+		if(RequestManager.getInstance().isInit())
+			RequestManager.getInstance().disconnect();
+		else
+			finish();
+	}
+
+	@Override
+	public void onFarewellSent()
+	{
+		runOnUiThread(new Runnable(){
+
+			@Override
+			public void run()
+			{
+				finish();
+			}
+			
+		});
 		
 	}
 }

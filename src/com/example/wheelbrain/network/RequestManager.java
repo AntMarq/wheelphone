@@ -17,7 +17,7 @@ import com.example.wheelbrain.network.Request.ERequestType;
 
 public class RequestManager
 {
-	
+	public IRequestListener delegate;
 	
 	/*******************************
 	 * InputThread
@@ -46,16 +46,39 @@ public class RequestManager
 		public void read(String readBuffer)
 		{
 			Request rq = Request.readRequestFromJson(readBuffer);
-			
-			if(rq.mType == ERequestType.Instructions)
+			Log.e("received",rq.mType.toString());
+			switch(rq.mType)
 			{
-				readInstructions(rq);
+				case Instructions : readInstructions(rq);
+				break;
+				
+				case Welcome : readWelcome(rq);
+					break;
+					
+				case Farewell : readFarewell(rq);
+					break;
+					
+				default:
+					break;
 			}
 		}
 		
 		public void readInstructions(Request rq)
 		{
 			ArrayList<Instruction> instr = Instruction.instructionsFromJson(rq.mContent);
+			delegate.onInstructionReceived(instr);
+		}
+		
+		public void readWelcome(Request rq)
+		{
+			delegate.onWelcomeReceived();
+			sendWelcome();
+		}
+		
+		public void readFarewell(Request rq)
+		{
+			delegate.onFarewellReceived();
+			close();
 		}
 		
 		@Override
@@ -150,6 +173,7 @@ public class RequestManager
 		
 		private void send(Request request){
 			try{
+				Log.e("sending",request.mType.toString());
 				dos.writeUTF(request.toJson().toString());
 				if(request.mType == ERequestType.Farewell){
 					closing = false;
@@ -171,6 +195,7 @@ public class RequestManager
 		
 		public void turnOff(){
 			running = false;
+			delegate.onFarewellSent();
 		}
 	}
 	
@@ -245,10 +270,6 @@ public class RequestManager
 		try
 		{
 			ConnectionManager.getInstance().socket.close();
-			if(ConnectionManager.getInstance().delegate != null)
-			{
-				ConnectionManager.getInstance().delegate.onConnectionClosed();
-			}
 		}
 		catch (IOException e)
 		{
@@ -257,7 +278,8 @@ public class RequestManager
 		}
 	}
 	
-	public void initConnection(){
+	public void initConnection()
+	{
 		inputThread = new InputThread(ConnectionManager.getInstance().socket);
 		outputThread = new OutputThread(ConnectionManager.getInstance().socket);
 		inputThread.start();
@@ -273,6 +295,18 @@ public class RequestManager
 	}
 	
 	public void sendRequest(Request request){
-		sendRequest(request);
+		outputThread.stackRequest(request);
+	}
+	
+	public void sendFarewell()
+	{
+		Request rq = new Request(ERequestType.Farewell , "");
+		sendRequest(rq);
+	}
+	
+	public void sendWelcome()
+	{
+		Request rq = new Request(ERequestType.Welcome , "");
+		sendRequest(rq);
 	}
 }

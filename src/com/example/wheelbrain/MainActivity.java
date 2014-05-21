@@ -1,25 +1,32 @@
 package com.example.wheelbrain;
 
+import instructions.Instruction;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.DialogInterface.OnCancelListener;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
+import com.example.wheelbrain.network.IRequestListener;
+import com.example.wheelbrain.network.RequestManager;
 import com.wheelphone.wheelphonelibrary.WheelphoneRobot;
 import com.wheelphone.wheelphonelibrary.WheelphoneRobot.WheelPhoneRobotListener;
 
-public class MainActivity extends Activity implements WheelPhoneRobotListener
+public class MainActivity extends Activity implements WheelPhoneRobotListener, IRequestListener
 {
 	//config
 	private Context context;
@@ -105,6 +112,7 @@ public class MainActivity extends Activity implements WheelPhoneRobotListener
 
 	@Override
 	public void onStart() {
+		RequestManager.getInstance().delegate = this;
 		if(debugUsbComm) {
 			logString = TAG + ": onStart";
 			Log.d(TAG, logString);
@@ -132,8 +140,7 @@ public class MainActivity extends Activity implements WheelPhoneRobotListener
 			Log.d(TAG, logString);
 			appendLog("debugUsbComm.txt", logString, false);
 		}    	
-    	super.onStop();    	
-    	android.os.Process.killProcess(android.os.Process.myPid());
+    	super.onStop();
     }
     
     @Override
@@ -153,7 +160,8 @@ public class MainActivity extends Activity implements WheelPhoneRobotListener
     //Update method -----------------------------
     
 	@Override
-	public void onWheelphoneUpdate() {
+	public void onWheelphoneUpdate()
+	{
 		Log.v(TAG, "onWheelphoneUpdate");
 		
 		if(getFirmwareFlag) {
@@ -316,4 +324,37 @@ public class MainActivity extends Activity implements WheelPhoneRobotListener
 	   }
 	}
 
+	@Override
+	public void onInstructionReceived(ArrayList<Instruction> _instrus)
+	{
+		//TODO Do your stuff here with the instructions. -- bitch --
+	}
+
+	@Override
+	public void onWelcomeReceived()
+	{
+	}
+
+	@Override
+	public void onFarewellReceived()
+	{
+		Intent intent = new Intent(this, ConnectionActivity.class);
+		startActivity(intent);
+		finish();
+    	RequestManager.getInstance().close();
+	}
+
+	@Override
+	public void onFarewellSent()
+	{
+		Intent intent = new Intent(this, ConnectionActivity.class);
+		startActivity(intent);
+		finish();
+	}
+
+	@Override 
+	public void onBackPressed()
+	{
+		RequestManager.getInstance().disconnect();
+	}
 }

@@ -58,7 +58,7 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver
             // callback on PeerListListener.onPeersAvailable()
             if (manager != null)
             {
-                manager.requestPeers(channel, (PeerListListener) delegate);
+                manager.requestPeers(channel, null);
             }
         }
         else if (WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION.equals(action))

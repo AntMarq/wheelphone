@@ -35,10 +35,6 @@ public class ConnectionManager
 		if(socket != null && socket.isConnected())
 		{
 			RequestManager.getInstance().close();
-			if(delegate != null)
-			{
-				delegate.onConnectionClosed();
-			}
 		}
 	}
 	
