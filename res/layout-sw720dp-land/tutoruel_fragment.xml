@@ -1,0 +1,159 @@
+<ScrollView
+        android:id="@+id/scrollView1" xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" >
+        
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical" >
+
+        <TextView
+            android:id="@+id/texttuto"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="30dp"
+            android:text="@string/Tutoriel"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textSize="30dp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" 
+            android:layout_marginTop="20dp">
+
+            <TextView
+                android:id="@+id/textobj"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:text="@string/objectifText"
+                android:textSize="@dimen/tuto_text" />
+
+            <TextView
+                android:id="@+id/objectif"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="47dp"
+                android:text="@string/objectif"
+                android:textSize="@dimen/tuto_text" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp" >
+
+            <ImageView
+                android:id="@+id/imageView1"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_gravity="center_vertical"
+                android:src="@drawable/warning" />
+
+            <TextView
+                android:id="@+id/textwarning"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="85dp"
+                android:text="@string/warning"
+                android:textSize="@dimen/tuto_text" />
+
+        </LinearLayout>
+
+	    <LinearLayout
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:layout_marginTop="20dp" >
+
+	        <TextView
+	            android:id="@+id/textetape1"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:text="@string/etape_1"
+	            android:textSize="24dp" />
+
+	        <TextView
+	            android:id="@+id/etape1_text"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:text="@string/notice_1"
+	            android:textSize="@dimen/tuto_text"
+	            android:layout_marginLeft="50dp" />
+
+	    </LinearLayout>
+
+	    <ImageView
+	        android:id="@+id/imageView2"
+	        android:layout_width="350dp"
+	        android:layout_height="175dp"
+	        android:layout_marginLeft="36dp"
+	        android:background="@drawable/game_screen_01" 
+	        android:layout_marginTop="20dp"/>
+
+	    <LinearLayout
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:layout_marginTop="20dp" >
+
+	        <TextView
+	            android:id="@+id/textView1"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:text="@string/etape_2"
+	            android:textSize="@dimen/tuto_text" />
+
+	        <TextView
+	            android:id="@+id/textView2"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:text="@string/notice_2"
+	            android:textSize="@dimen/tuto_text"
+	            android:layout_marginLeft="50dp" />
+	    </LinearLayout>
+
+	    <ImageView
+	        android:id="@+id/imageView3"
+	        android:layout_width="350dp"
+	        android:layout_height="175dp"
+	        android:background="@drawable/game_sreen_color" 
+	        android:layout_marginLeft="36dp"
+	        android:layout_marginTop="20dp"/>
+
+	    <LinearLayout
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content" 
+	        android:layout_marginTop="20dp">
+
+	        <TextView
+	            android:id="@+id/textView3"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:text="@string/etape_3"
+	            android:textSize="@dimen/tuto_text" />
+
+	        <TextView
+	            android:id="@+id/textView4"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:text="@string/notice_3"
+	            android:textSize="@dimen/tuto_text" 
+	            android:layout_marginLeft="50dp"/>
+
+	    </LinearLayout>
+
+	    <ImageView
+	        android:id="@+id/imageView4"
+	        android:layout_width="350dp"
+	        android:layout_height="175dp"
+	        android:layout_marginLeft="36dp"	        
+	        android:src="@drawable/game_sreen_color"
+	        android:layout_marginTop="20dp" 
+	        android:layout_marginBottom ="20dp"/>
+      
+        </LinearLayout>
+    </ScrollView>

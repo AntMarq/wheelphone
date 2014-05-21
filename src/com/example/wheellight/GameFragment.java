@@ -46,7 +46,7 @@ public class GameFragment extends Fragment{
 	private TextView userInfo;
 	private Button startGame, choosemap;
 	private MapGridViewAdapter adapter; 
-	private ImageButton imageButtonColor;
+	private ImageButton imageButtonColor, helpButton;
 	private ImageButton left,up,right;
 	private ImageView selectColor, crossStartDelete, crossBlueDelete, crossGreenDelete, crossBlackDelete, crossBeigeDelete;
 	private int size = 125;
@@ -59,6 +59,7 @@ public class GameFragment extends Fragment{
 	private int setColorInChild;
 	private LinearLayout blueLinear, greenLinear, beigeLinear, blackLinear,startLinear;
 	private ImageView image;
+	private int nbre_arrowmax = 4;
 
 	HashMap<String, ArrayList<Instruction>> colorsInstructions = new HashMap<String, ArrayList<Instruction>>();
 	ArrayList<TypeOfCell> structureMap;
@@ -83,7 +84,7 @@ public class GameFragment extends Fragment{
 			LoadMapInSharePreferences();
 		}
 
-		userInfo = (TextView)view.findViewById(R.id.notice);
+	//	userInfo = (TextView)view.findViewById(R.id.notice);
 		startGame = (Button)view.findViewById(R.id.startbutton);
 		choosemap = (Button)view.findViewById(R.id.choosemap);
 		selectColor = (ImageView)view.findViewById(R.id.imageView17);
@@ -103,8 +104,8 @@ public class GameFragment extends Fragment{
 		up = (ImageButton)view.findViewById(R.id.imageButtonUp);
 		right = (ImageButton)view.findViewById(R.id.imageButtonRight);
 
-		userInfo.setText(Html.fromHtml("Selectionner une couleur en cliquant sur le pot de peinture <br /><br /> Remplisser la grille avec la couleur de votre choix <br /><br /> &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp et/ou <br /><br /> Saisisser la squence de mouvement en fonction de la couleur selectionne"));
-		userInfo.setBackgroundColor(getResources().getColor(R.color.white));
+	//	userInfo.setText(Html.fromHtml("Selectionner une couleur en cliquant sur le pot de peinture <br /><br /> Remplisser la grille avec la couleur de votre choix <br /><br /> &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp et/ou <br /><br /> Saisisser la squence de mouvement en fonction de la couleur selectionne"));
+	//	userInfo.setBackgroundColor(getResources().getColor(R.color.white));
 		
 		if(selectColor.getBackground() != null)
 		{
@@ -112,6 +113,22 @@ public class GameFragment extends Fragment{
 			setColorInChild = 0;
 		}
 		structureMap = mapSelect.getMapStructure();
+		
+		
+		helpButton = (ImageButton)view.findViewById(R.id.helpButton);
+		helpButton.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				TutorielFragment gameFragment = new TutorielFragment();  
+					
+		        getFragmentManager().beginTransaction()
+		                .replace(R.id.mainfragment, gameFragment)
+		                .addToBackStack(null)
+		                .commit();	
+			}
+		});
+		
 ///////////////////////////////////////////////////////////////////////////
 ///////////////////////// Insert Arrow in layout ///////////////////////////
 ///////////////////////////////////////////////////////////////////////////
@@ -189,9 +206,17 @@ public class GameFragment extends Fragment{
 ///////////////////////////////////////////////////////////////////////////		
 		final OnColorChangedListener listener=new OnColorChangedListener() {  
 		       @Override  
-		       public void colorChanged(int color) {  
+		       public void colorChanged(int color) { 
+		    	   Log.v(tag, "color = " + color + " / " + R.color.white);
 		        setColorInChild = color;
-				selectColor.setImageResource(setColorInChild);
+		        if(color == R.color.white)
+		        {
+		        	selectColor.setImageResource(R.drawable.search_noarrow);
+		        }
+		        else
+		        {
+		        	selectColor.setImageResource(setColorInChild);
+		        }				
 		       }  
 		     };
 		     
@@ -296,7 +321,6 @@ public class GameFragment extends Fragment{
 		else
 		{
 			mapSelect = db.getSelectMap(1);
-			Toast.makeText(getActivity().getApplicationContext(), "map par defaut charge", Toast.LENGTH_SHORT).show();
 		}
 	}
 	
@@ -332,7 +356,7 @@ public class GameFragment extends Fragment{
 		{			
 			if(setColorInChild == R.color.dark_blue)
 			{
-				if(blueLinear.getChildCount() < 3 )
+				if(blueLinear.getChildCount() < nbre_arrowmax )
 				{
 					drawImageArrowInLayout(blueLinear,imgBtn);
 				}else
@@ -342,7 +366,7 @@ public class GameFragment extends Fragment{
 			}
 			else if(setColorInChild == R.color.beige)
 			{
-				if(beigeLinear.getChildCount() < 3 )
+				if(beigeLinear.getChildCount() < nbre_arrowmax )
 				{
 					drawImageArrowInLayout(beigeLinear, imgBtn);
 				}
@@ -353,7 +377,7 @@ public class GameFragment extends Fragment{
 			}
 			else if(setColorInChild == R.color.green)
 			{
-				if(greenLinear.getChildCount() < 3 )
+				if(greenLinear.getChildCount() < nbre_arrowmax )
 				{
 					drawImageArrowInLayout(greenLinear, imgBtn);
 				}
@@ -364,7 +388,7 @@ public class GameFragment extends Fragment{
 			}
 			else if(setColorInChild == R.color.noir)
 			{
-				if(blackLinear.getChildCount() < 3 )
+				if(blackLinear.getChildCount() < nbre_arrowmax )
 				{
 					drawImageArrowInLayout(blackLinear, imgBtn);
 				}
@@ -375,7 +399,7 @@ public class GameFragment extends Fragment{
 			}
 			else if(setColorInChild == R.color.white)
 			{
-				if(startLinear.getChildCount() < 3 )
+				if(startLinear.getChildCount() < nbre_arrowmax )
 				{
 					drawImageArrowInLayout(startLinear, imgBtn);
 				}
@@ -391,7 +415,7 @@ public class GameFragment extends Fragment{
 		}
 		else
 		{
-			Toast.makeText(getActivity(), "Slectionner une couleur et cliquer sur une flche", Toast.LENGTH_SHORT).show();
+			Toast.makeText(getActivity(), "Selectionner une couleur et cliquer sur une flèche", Toast.LENGTH_SHORT).show();
 		}
 	}
 	
@@ -400,13 +424,13 @@ public class GameFragment extends Fragment{
 		image = new ImageView(getActivity());
 		image.setImageDrawable(btn.getDrawable());
 		image.setLayoutParams(new LayoutParams(48, 48) {});
-		image.setPadding(20, 10, 0, 10);					
+		image.setPadding(8, 10, 0, 10);					
 		selectLinear.addView(image);
 	}
 	
 	public void displayToast()
 	{
-		Toast.makeText(getActivity(), "3 mouvements max par couleur", Toast.LENGTH_SHORT).show();
+		Toast.makeText(getActivity(), nbre_arrowmax + " mouvements max par couleur", Toast.LENGTH_SHORT).show();
 	}
 	
 	public void sendInstructions() 

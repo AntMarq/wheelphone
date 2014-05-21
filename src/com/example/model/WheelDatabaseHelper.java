@@ -27,12 +27,12 @@ public class WheelDatabaseHelper extends SQLiteOpenHelper  {
 				"image BLOB" +
 				")");
 		
-		db.execSQL("INSERT INTO map (title,structure) VALUES ('map1_Demo','Start,Red,None,None,Blue,None,None,Black,Beige,Red,Blue,Beige,Beige,None,Green,None,Black,Green,Red,Black,None,None,None,Beige,End')");
-		db.execSQL("INSERT INTO map (title,structure) VALUES ('map2_Demo','Start,Blue,Blue,None,None,"
+		db.execSQL("INSERT INTO map (title,structure) VALUES ('map1_Demo','Start,None,None,None,None,None,None,None,None,None,None,None,None,None,None,None,None,None,None,None,None,None,None,None,End')");
+	/*	db.execSQL("INSERT INTO map (title,structure) VALUES ('map2_Demo','Start,Blue,Blue,None,None,"
 																	+ "None,None,Blue,Blue,None,"
 																	+ "None,None,None,Blue,None,"
 																	+ "None,None,None,Blue,Blue,"
-																	+ "None,None,None,None,End')");
+																	+ "None,None,None,None,End')"); */
 
 	}
 

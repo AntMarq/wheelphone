@@ -72,6 +72,7 @@
                 android:id="@+id/imageView9"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
+                android:layout_gravity="center_vertical"
                 android:layout_marginLeft="5dp"
                 android:baselineAlignBottom="true"
                 android:src="@drawable/cross" />
@@ -110,9 +111,10 @@
                 android:id="@+id/imageView10"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
-                android:src="@drawable/cross"
-                android:layout_marginLeft="5dp"               
-                android:baselineAlignBottom="true" />
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="5dp"
+                android:baselineAlignBottom="true"
+                android:src="@drawable/cross" />
 
         </LinearLayout>
 
@@ -147,10 +149,10 @@
                 android:id="@+id/imageView11"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
-                android:src="@drawable/cross"
-                android:layout_marginLeft="5dp"               
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="5dp"
                 android:baselineAlignBottom="true"
-                 />
+                android:src="@drawable/cross" />
 
         </LinearLayout>
 
@@ -161,7 +163,8 @@
             android:layout_alignParentLeft="true"
             android:layout_alignParentRight="true"
             android:layout_below="@+id/LinearLayout9"
-            android:orientation="horizontal" >
+            android:orientation="horizontal" 
+            android:layout_marginTop="30dp">
 
             <ImageButton
                 android:id="@+id/imageView1"
@@ -172,7 +175,7 @@
                 android:adjustViewBounds="true"
                 android:background="@color/dark_blue"
                 android:baselineAlignBottom="true"
-                android:layout_marginTop="20dp" />
+                />
 
             <LinearLayout
                 android:id="@+id/LinearLayout15"
@@ -181,7 +184,7 @@
                 android:layout_weight="0.97"
                 android:background="@drawable/border"
                 android:orientation="horizontal"
-                android:layout_marginTop="20dp"  >
+                  >
 
              
 
@@ -191,15 +194,15 @@
                 android:id="@+id/imageView7"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
+                android:layout_gravity="center_vertical"
                 android:layout_marginLeft="5dp"
-                
                 android:baselineAlignBottom="true"
                 android:src="@drawable/cross" />
 
         </LinearLayout>
 
         <TextView
-            android:id="@+id/textView1"
+            android:id="@+id/texttuto"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
@@ -214,7 +217,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_alignParentRight="true"
-            android:layout_below="@+id/textView1"
+            android:layout_below="@+id/texttuto"
             android:orientation="horizontal"
             android:layout_marginTop="20dp">
 
@@ -241,7 +244,8 @@
                 android:id="@+id/imageView8"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
-                android:layout_marginLeft="5dp"               
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="5dp"
                 android:baselineAlignBottom="true"
                 android:src="@drawable/cross" />
 
@@ -334,8 +338,8 @@
         android:layout_alignParentRight="true"
         android:layout_alignTop="@+id/RelativeLayout2"
         android:layout_marginLeft="70dp"
-        android:layout_marginRight="20dp"
-        android:layout_toRightOf="@+id/RelativeLayout2" >
+        android:layout_toRightOf="@+id/RelativeLayout2"
+        android:layout_marginRight="10dp" >
 
         <Button
             android:id="@+id/choosemap"
@@ -347,30 +351,33 @@
 
         <LinearLayout
             android:id="@+id/LinearLayout20"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignLeft="@+id/choosemap"
             android:layout_alignRight="@+id/choosemap"
             android:layout_below="@+id/choosemap"
             android:layout_marginTop="49dp"
+            android:gravity="center_vertical"
             android:orientation="horizontal" >
 
             <ImageButton
                 android:id="@+id/imageButtonColor"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:background="@drawable/pot_color" />
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="20dp"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/icon_color" />
 
             <ImageView
                 android:id="@+id/imageView17"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:layout_marginLeft="10dp"
-                android:src="@drawable/border"
-                android:background="@drawable/no_color" />
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:layout_gravity="center_vertical"
+                android:src="@drawable/no_color" />
+
         </LinearLayout>
 
-        <TextView
+     <!--    <TextView
             android:id="@+id/notice"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -378,7 +385,7 @@
             android:layout_centerVertical="true"
             android:text="@string/app_name"
             android:textSize="20dp"
-            android:typeface="sans" />
+            android:typeface="sans" />--> 
 
         <Button
             android:id="@+id/startbutton"
@@ -388,6 +395,36 @@
             android:layout_centerHorizontal="true"
             android:layout_marginBottom="50dp"
             android:background="@drawable/start_game" />
+
+        <TextView
+            android:id="@+id/textView4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/LinearLayout20"
+            android:layout_alignRight="@+id/LinearLayout20"
+            android:layout_below="@+id/choosemap"
+            android:layout_marginTop="27dp"
+            android:gravity="center_horizontal"
+            android:text="@string/choose_color"
+            android:textSize="16dp" />
+
+        <ImageButton
+            android:id="@+id/helpButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/textView5"
+            android:layout_below="@+id/LinearLayout20"
+            android:layout_marginTop="116dp"
+            android:background="@drawable/question_sign" />
+
+        <TextView
+            android:id="@+id/textView5"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/LinearLayout20"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="89dp"
+            android:text="@string/help" />
 
     </RelativeLayout>
 

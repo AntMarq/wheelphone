@@ -22,6 +22,24 @@
     
     <string name="play_msg">Cette fonctionnalité est en cours de développement</string>
     
+    <string name="etape_1">Etape 1</string>
+    <string name="notice_1">Choisissez une couleur à l\'aide de la palette </string>
+    
+    <string name="etape_2">Etape 2</string>
+    <string name="notice_2">Appliquer la couleur sélectionnée sur les cases du plateau de jeu </string>
+    
+    <string name="etape_3">Etape 3</string>
+    <string name="notice_3">Utilisez les flèches directionnelles afin de définir les instructions pour la couleur sélectionnée </string>
+    
+     <string name="choose_color">Choix de la couleur</string>
+     <string name="help">Besoin d\'aide ?</string>
+     <string name="objectifText">Objectif</string>
+     <string name="objectif">Définissez le parcours qu\'effectuera votre robot pour atteindre son objectif</string>
+     <string name="warning">Placer l\'avant du robot dans le sens de la flèche indiqué sur l\'icone du robot</string>
+
+     
+            
+    
     
     
     
