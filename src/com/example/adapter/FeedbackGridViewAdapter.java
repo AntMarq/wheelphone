@@ -1,6 +1,8 @@
 package com.example.adapter;
 
 
+import java.util.ArrayList;
+
 import android.content.Context;
 import android.graphics.Color;
 import android.view.View;
@@ -11,15 +13,17 @@ import android.widget.ImageView;
 
 import com.example.enumClass.TypeOfCell;
 import com.example.model.GameMap;
+import com.example.wheellight.FeedbackFragment.BotDirection;
 import com.example.wheellight.R;
 
-public class MapGridViewAdapter extends BaseAdapter{
+public class FeedbackGridViewAdapter extends BaseAdapter{
 
 	private Context mContext;
 	private int size;
-	private GameMap mapData;
+	private ArrayList<TypeOfCell> mapData;
+	private BotDirection botDirection = BotDirection.Right;
 	
-	public MapGridViewAdapter(Context c, int _size, GameMap _mapData){
+	public FeedbackGridViewAdapter(Context c, int _size, ArrayList<TypeOfCell> _mapData){
 	    mContext = c;
 	    size = _size;
 	    mapData = _mapData;
@@ -47,7 +51,7 @@ public class MapGridViewAdapter extends BaseAdapter{
 	public View getView(int position, View convertView, ViewGroup parent) {
 		
 		ImageView imageView;	
-		TypeOfCell enumColor = mapData.getMapStructure().get(position);
+		TypeOfCell enumColor = mapData.get(position);
 
         if (convertView == null) {  // if it's not recycled, initialize some attributes
             imageView = new ImageView(mContext);
@@ -75,6 +79,25 @@ public class MapGridViewAdapter extends BaseAdapter{
 			 imageView.setBackgroundResource(R.color.dark_blue);
 			 break;
 		 case Start:
+			 switch(botDirection)
+			 {
+				 case Right:
+					 imageView.setRotation(0f);
+			     break;
+					 
+				 case Left:
+					 imageView.setRotation(0f);
+					 imageView.setBackgroundResource(R.drawable.search_mirror);
+					 break;
+					 
+				 case Up:
+					 imageView.setRotation(270f);
+					 break;
+					 
+				 case Down:
+					 imageView.setRotation(90f);
+					 break;
+			 }
 			 imageView.setBackgroundResource(R.drawable.search);
 			 break;
 		 case End:
@@ -91,4 +114,12 @@ public class MapGridViewAdapter extends BaseAdapter{
     
         return imageView;
 	}
+	
+	public void setData(ArrayList<TypeOfCell> _mapData, BotDirection _direction)
+	{
+		mapData = _mapData;
+		botDirection = _direction;
+		notifyDataSetChanged();
+	}
+
 }

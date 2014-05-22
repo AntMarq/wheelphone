@@ -11,6 +11,9 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import android.util.Log;
 
 import com.example.wheellight.network.Request.ERequestType;
@@ -18,6 +21,7 @@ import com.example.wheellight.network.Request.ERequestType;
 public class RequestManager
 {
 	public IRequestListener delegate;
+	public IOrderCompleteListener orderCompleteDeletage;
 	
 	/*******************************
 	 * InputThread
@@ -47,6 +51,7 @@ public class RequestManager
 		{
 			Request rq = Request.readRequestFromJson(readBuffer);
 			Log.e("received",rq.mType.toString());
+
 			switch(rq.mType)
 			{
 				case Farewell : readFarewell(rq);
@@ -55,11 +60,54 @@ public class RequestManager
 				case Welcome : readWelcome(rq);
 					break;
 					
+				case Complete : readComplete(rq);
+					break;
+					
 				default:
 					break;
 			}
 		}
 		
+		private void readComplete(Request _rq)
+		{
+			if(orderCompleteDeletage != null)
+			{
+				JSONObject content;
+				try
+				{
+					content = new JSONObject(_rq.mContent);
+					Instruction readInstruction = Instruction.newFromJson(content);
+					
+					switch(readInstruction.type)
+					{
+						case Forward: orderCompleteDeletage.onForwardComplete();
+							break;
+							
+						case Right: orderCompleteDeletage.onRightComplete();
+							break;
+							
+						case Left: orderCompleteDeletage.onLeftComplete();
+							break;
+							
+						case Win: orderCompleteDeletage.onWinComplete();
+							break;
+							
+						case Lose: orderCompleteDeletage.onLoseComplete();
+							break;
+							
+						default:
+							break;
+					}
+				}
+				catch (JSONException e)
+				{
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+
+		}
+
 		public void readFarewell(Request rq)
 		{
 			if(delegate != null)

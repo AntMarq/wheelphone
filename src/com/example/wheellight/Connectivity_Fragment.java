@@ -65,11 +65,31 @@ IWifiP2PListener, PeerListListener, IConnectionManagerListener, ConnectionInfoLi
 	
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
 	{
+	    if(FeedbackFragment.isQuitting)
+	    {
+	    	FeedbackFragment.isQuitting = false;
+	    	getFragmentManager().popBackStackImmediate();
+	    }
+	    else
+	    {
+			Bundle b = getArguments();
+			instrus = (ArrayList<Instruction>)b.getSerializable("instruction");
+			
+			if(RequestManager.getInstance().isInit())
+			{
+				RequestManager.getInstance().sendInstructions(instrus);
+				
+				FeedbackFragment feedbackFragment = new FeedbackFragment();
+		        getFragmentManager().beginTransaction()
+		                .replace(R.id.mainfragment, feedbackFragment)
+		                .addToBackStack(null)
+		                .commit();	
+			}
+	    }
+			
 		RequestManager.getInstance().delegate = this;
 		View view = inflater.inflate(getResources().getLayout(R.layout.connectivity_fragment), container, false);
 		context = (WheelLightApp) getActivity().getApplicationContext();
-		Bundle b = getArguments();
-		instrus = (ArrayList<Instruction>)b.getSerializable("instruction");
 		mListView = (ListView)view.findViewById(R.id.connection_list);
 		mListView.setAdapter(new DeviceP2PAdapter());
 		mListView.setOnItemClickListener(new OnItemClickListener()
@@ -133,7 +153,7 @@ IWifiP2PListener, PeerListListener, IConnectionManagerListener, ConnectionInfoLi
 		if(progressDialog != null && progressDialog.isShowing())
 			progressDialog.dismiss();
 		
-		progressDialog = ProgressDialog.show(getActivity(), "Please wait", "Finding peers...", true);
+		progressDialog = ProgressDialog.show(getActivity(), "Please wait", "Looking for peers...", true);
 		progressDialog.setCancelable(true);
 		progressDialog.setOnCancelListener(new OnCancelListener()
 		{
@@ -223,7 +243,7 @@ IWifiP2PListener, PeerListListener, IConnectionManagerListener, ConnectionInfoLi
 		if(progressDialog != null && progressDialog.isShowing())
 			progressDialog.dismiss();
 		
-		progressDialog = ProgressDialog.show(getActivity(), "Please wait", "Waiting for target response.", true);
+		progressDialog = ProgressDialog.show(getActivity(), "Please wait", "Waiting for target response...", true);
 		progressDialog.setCancelable(true);
 		progressDialog.setOnCancelListener(new OnCancelListener()
 		{
@@ -283,7 +303,7 @@ IWifiP2PListener, PeerListListener, IConnectionManagerListener, ConnectionInfoLi
 					progressDialog.dismiss();
 				
 				ConnectionManager.getInstance().startListening(this);
-				progressDialog = ProgressDialog.show(getActivity(), "Server", "Server socket awaiting connection.", true);
+				progressDialog = ProgressDialog.show(getActivity(), "Please wait", "Server socket awaiting connection...", true);
 				progressDialog.setCancelable(true);
 				progressDialog.setOnCancelListener(new OnCancelListener()
 				{
@@ -444,7 +464,7 @@ IWifiP2PListener, PeerListListener, IConnectionManagerListener, ConnectionInfoLi
 		if(progressDialog != null && progressDialog.isShowing())
 			progressDialog.dismiss();
 		
-		progressDialog = ProgressDialog.show(getActivity(), "Socket", "Sending informations to client.", true);
+		progressDialog = ProgressDialog.show(getActivity(), "Please wait", "Sending informations to client...", true);
 		progressDialog.setCancelable(true);
 		progressDialog.setOnCancelListener(new OnCancelListener()
 		{
@@ -476,7 +496,7 @@ IWifiP2PListener, PeerListListener, IConnectionManagerListener, ConnectionInfoLi
 	{
 		if(RequestManager.getInstance().isInit())
 		{
-			progressDialog = ProgressDialog.show(getActivity(), "Closing", "Closing connection.", true);
+			progressDialog = ProgressDialog.show(getActivity(), "Closing", "Closing connection...", true);
 			progressDialog.setCancelable(true);
 			progressDialog.setOnCancelListener(new OnCancelListener()
 			{
@@ -519,7 +539,7 @@ IWifiP2PListener, PeerListListener, IConnectionManagerListener, ConnectionInfoLi
 		{
 		    public void run()
 		    {
-		    	if(progressDialog != null && progressDialog.isShowing())
+		    	/*if(progressDialog != null && progressDialog.isShowing())
 					progressDialog.dismiss();
 				
 				progressDialog = ProgressDialog.show(getActivity(), "Playing", "Now playing.", true);
@@ -533,8 +553,14 @@ IWifiP2PListener, PeerListListener, IConnectionManagerListener, ConnectionInfoLi
 						if(dialogCount == 0)
 							requestQuit();
 					}
-				});
+				});*/
+		    	progressDialog.dismiss();
 				RequestManager.getInstance().sendInstructions(instrus);
+				FeedbackFragment feedbackFragment = new FeedbackFragment();
+		        getFragmentManager().beginTransaction()
+		                .replace(R.id.mainfragment, feedbackFragment)
+		                .addToBackStack(null)
+		                .commit();	
 		    }
 		});
 	

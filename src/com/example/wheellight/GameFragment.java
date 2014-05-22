@@ -288,10 +288,11 @@ public class GameFragment extends Fragment{
 			
 			@Override
 			public void onClick(View v) {
-				
+				saveMapInGridView();
 				sendInstructions();
 					
 				Log.v(tag, "sendStructure = " + sendStructure.toString());
+				
 				
 				Connectivity_Fragment conFragment = new Connectivity_Fragment();  
 				Bundle bdl = new Bundle();
