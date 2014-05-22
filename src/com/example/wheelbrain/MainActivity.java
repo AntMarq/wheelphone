@@ -11,6 +11,7 @@ import java.util.ArrayList;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -21,7 +22,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.wheelbrain.network.IRequestListener;
 import com.example.wheelbrain.network.RequestManager;
@@ -50,14 +50,13 @@ public class MainActivity extends Activity implements WheelPhoneRobotListener, I
 	//UI
 	private TextView batteryVoltage;
 	private TextView connectionState;
-	private Button moveStateSwitch;
 	private TextView moveAngle;
 	private TextView forwardDistanceX, forwardDistanceY;
 	private TextView wheelsSpeed;
+	private ProgressDialog progressDialog;
 	
 	//move 
 	private boolean isConnect   = false;
-	private boolean isMoving    = false;
 	private boolean moveIsEnded = true;
 	//private double deltaAngle   = 0.0;
 	
@@ -89,7 +88,6 @@ public class MainActivity extends Activity implements WheelPhoneRobotListener, I
 		
 		batteryVoltage   = (TextView)findViewById(R.id.batteryVoltage);
 		connectionState  = (TextView)findViewById(R.id.connectionState);
-		moveStateSwitch  = (Button)findViewById(R.id.moveStateSwitch);
 		moveAngle		 = (TextView)findViewById(R.id.moveAngle);
 		forwardDistanceX = (TextView)findViewById(R.id.forwardDistanceX);
 		forwardDistanceY = (TextView)findViewById(R.id.forwardDistanceY);
@@ -100,26 +98,6 @@ public class MainActivity extends Activity implements WheelPhoneRobotListener, I
         wheelphone.enableSoftAcceleration();
         //wheelphone.enableObstacleAvoidance();
         //wheelphone.enableCliffAvoidance();
-        
-        //set click listener
-        moveStateSwitch.setOnClickListener(new View.OnClickListener() {
-        	public void onClick(View arg0) {
-        		if(isConnect && !isMoving) {
-            		isMoving = true;
-            		
-            		moveStateSwitch.setText("Stop");
-            	} else {
-            		isMoving = false;
-            		
-            		lSpeed = 0;
-            		rSpeed = 0;
-            		
-            		wheelphone.setSpeed(lSpeed, rSpeed);
-            		
-            		moveStateSwitch.setText("Start");
-            	}
-        	}
-        });
         
         //release when end playing
         soundPlayer.setOnCompletionListener(new OnCompletionListener() {
@@ -225,89 +203,93 @@ public class MainActivity extends Activity implements WheelPhoneRobotListener, I
 		
 		//read start instruction
 		
-		if(commandsArray.size() > 0 && commandsArray.get(curCommandIndex).type == EInstructionType.Start) {
-			isMoving = true;
-			curCommandIndex++;	
-		}
-		
-		if(isConnect && isMoving) {
-			if(curCommandIndex < commandsArray.size()) {
-				if(moveIsEnded) {
-					wheelphone.resetOdometry();
-				}
-				moveIsEnded = false;
-				
-				curCommand = commandsArray.get(curCommandIndex);
-				
-				switch(curCommand.type) {
-				
-				case Forward:
-					rSpeed = 100;
-					lSpeed = 100;
-					
-					if(Math.toDegrees(wheelphone.getOdometryTheta()) < 0) {
-						rSpeed -= (int)(Math.toDegrees(wheelphone.getOdometryTheta()) * 10) / 2;
-					} else if(Math.toDegrees(wheelphone.getOdometryTheta()) > 0) {
-						lSpeed += (int)(Math.toDegrees(wheelphone.getOdometryTheta()) * 10) / 2;
+		if(commandsArray.size() > 0) {
+			if(progressDialog != null && progressDialog.isShowing())
+				progressDialog.dismiss();
+			
+			if(isConnect) {
+				if(curCommandIndex < commandsArray.size()) {
+					if(moveIsEnded) {
+						wheelphone.resetOdometry();
 					}
+					moveIsEnded = false;
 					
-					wheelphone.setSpeed(lSpeed, rSpeed);
+					curCommand = commandsArray.get(curCommandIndex);
 					
-					if(wheelphone.getOdometryX() > 200 || wheelphone.getOdometryX() < -200 ||
-					   wheelphone.getOdometryY() > 200 || wheelphone.getOdometryY() < -200) {
+					switch(curCommand.type) {
+					case Start :
+						curCommandIndex++;
+						break;
+					case Forward:
+						rSpeed = 100;
+						lSpeed = 100;
 						
-						stopWheelphone();
+						if(Math.toDegrees(wheelphone.getOdometryTheta()) < 0) {
+							rSpeed -= (int)(Math.toDegrees(wheelphone.getOdometryTheta()) * 10) / 2;
+						} else if(Math.toDegrees(wheelphone.getOdometryTheta()) > 0) {
+							lSpeed += (int)(Math.toDegrees(wheelphone.getOdometryTheta()) * 10) / 2;
+						}
+						
+						wheelphone.setSpeed(lSpeed, rSpeed);
+						
+						if(wheelphone.getOdometryX() > 200 || wheelphone.getOdometryX() < -200 ||
+						   wheelphone.getOdometryY() > 200 || wheelphone.getOdometryY() < -200) {
+							
+							stopWheelphone();
+						}
+						break;
+					case Left:
+						lSpeed = 0;
+						rSpeed = 50;
+						
+						wheelphone.setSpeed(lSpeed, rSpeed);
+						
+						if(Math.toDegrees(wheelphone.getOdometryTheta()) > 89) {
+							stopWheelphone();
+						}
+						break;
+					case Right:
+						lSpeed = 50;
+						rSpeed = 0;
+						
+						wheelphone.setSpeed(lSpeed, rSpeed);
+						
+						if(Math.toDegrees(wheelphone.getOdometryTheta()) < -89) {
+							stopWheelphone();
+						}
+						break;
+					case Win:
+						lSpeed = 0;
+						rSpeed = 0;
+						
+						wheelphone.setSpeed(lSpeed, rSpeed);
+						
+						soundPlayer = MediaPlayer.create(MainActivity.this, R.raw.win );
+						soundPlayer.start();
+						
+						commandsArray.clear();
+						curCommandIndex = 0;
+						break;
+					case Lose:
+						lSpeed = 0;
+						rSpeed = 0;
+						
+						wheelphone.setSpeed(lSpeed, rSpeed);
+						
+						soundPlayer = MediaPlayer.create(MainActivity.this, R.raw.lose );
+						soundPlayer.start();
+						
+						commandsArray.clear();
+						curCommandIndex = 0;
+						break;
 					}
-					break;
-				case Left:
-					lSpeed = 0;
-					rSpeed = 50;
 					
-					wheelphone.setSpeed(lSpeed, rSpeed);
-					
-					if(Math.toDegrees(wheelphone.getOdometryTheta()) > 89) {
-						stopWheelphone();
-					}
-					break;
-				case Right:
-					lSpeed = 50;
-					rSpeed = 0;
-					
-					wheelphone.setSpeed(lSpeed, rSpeed);
-					
-					if(Math.toDegrees(wheelphone.getOdometryTheta()) < -89) {
-						stopWheelphone();
-					}
-					break;
-				case Win:
-					lSpeed = 0;
-					rSpeed = 0;
-					
-					wheelphone.setSpeed(lSpeed, rSpeed);
-					
-					soundPlayer = MediaPlayer.create(MainActivity.this, R.raw.win );
-					soundPlayer.start();
-					
-					//TODO playsound
-					break;
-				case Lose:
-					lSpeed = 0;
-					rSpeed = 0;
-					
-					wheelphone.setSpeed(lSpeed, rSpeed);
-					
-					soundPlayer = MediaPlayer.create(MainActivity.this, R.raw.lose );
-					soundPlayer.start();
-					
-					//TODO playsound
-					break;
 				}
-				
-			} else {
-				isMoving = false;
-				moveStateSwitch.setText("Start");
-				
-				curCommandIndex = 0;
+			}
+		} else {
+			if(progressDialog == null || !progressDialog.isShowing()) {
+				progressDialog = ProgressDialog.show(this, "Socket", "Receiving instructions", true);
+				progressDialog.setCancelable(false);
 			}
 		}
 	}
@@ -379,6 +361,8 @@ public class MainActivity extends Activity implements WheelPhoneRobotListener, I
 	@Override
 	public void onInstructionReceived(ArrayList<Instruction> _instrus)
 	{
+		curCommandIndex = 0;
+		
 		commandsArray = _instrus;
 	}
 

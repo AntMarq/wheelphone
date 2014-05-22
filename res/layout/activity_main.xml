@@ -18,22 +18,13 @@
         android:text=""
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
-    <Button
-        android:id="@+id/moveStateSwitch"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/connectionState"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="16dp"
-        android:text="Start" />
-
     <TextView
         android:id="@+id/moveAngle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_alignParentRight="true"
-        android:layout_below="@+id/moveStateSwitch"
+        android:layout_centerInParent="true"
         android:layout_marginTop="15dp"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
