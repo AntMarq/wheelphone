@@ -92,7 +92,7 @@
 	        android:layout_width="350dp"
 	        android:layout_height="175dp"
 	        android:layout_marginLeft="36dp"
-	        android:background="@drawable/game_screen_01" 
+	        android:background="@drawable/etape1" 
 	        android:layout_marginTop="20dp"/>
 
 	    <LinearLayout
@@ -120,7 +120,7 @@
 	        android:id="@+id/imageView3"
 	        android:layout_width="350dp"
 	        android:layout_height="175dp"
-	        android:background="@drawable/game_sreen_color" 
+	        android:background="@drawable/etape2" 
 	        android:layout_marginLeft="36dp"
 	        android:layout_marginTop="20dp"/>
 
@@ -146,14 +146,20 @@
 
 	    </LinearLayout>
 
-	    <ImageView
-	        android:id="@+id/imageView4"
-	        android:layout_width="350dp"
-	        android:layout_height="175dp"
-	        android:layout_marginLeft="36dp"	        
-	        android:src="@drawable/game_sreen_color"
-	        android:layout_marginTop="20dp" 
-	        android:layout_marginBottom ="20dp"/>
+	    <LinearLayout
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content" >
+
+	        <ImageView
+	            android:id="@+id/imageView4"
+	            android:layout_width="350dp"
+	            android:layout_height="175dp"
+	            android:layout_marginBottom="20dp"
+	            android:layout_marginLeft="36dp"
+	            android:layout_marginTop="20dp"
+	            android:background="@drawable/etape3_legende" />
+
+	    </LinearLayout>
       
         </LinearLayout>
     </ScrollView>
