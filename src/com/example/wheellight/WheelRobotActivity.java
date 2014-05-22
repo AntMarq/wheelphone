@@ -26,7 +26,8 @@ public class WheelRobotActivity extends FragmentActivity{
 			
 			@Override
 			public void onClick(View v) {
-				
+				Intent i = new Intent(WheelRobotActivity.this, TutorielActivity.class);
+				startActivity(i); 
 			}
 		});
 		

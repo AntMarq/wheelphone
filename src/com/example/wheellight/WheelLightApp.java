@@ -11,5 +11,6 @@ public class WheelLightApp extends Application
 	{
 		super.onCreate();
 		WheelDatabase.getInstance(getApplicationContext());
+	
 	}
 }
