@@ -6,7 +6,8 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical" >
+        android:orientation="vertical"
+        android:layout_marginLeft="10dp" >
 
         <TextView
             android:id="@+id/texttuto"
@@ -49,18 +50,19 @@
 
             <ImageView
                 android:id="@+id/imageView1"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:layout_gravity="center_vertical"
-                android:src="@drawable/warning" />
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:src="@drawable/warning"
+                android:layout_marginLeft="10dp" />
 
             <TextView
                 android:id="@+id/textwarning"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
-                android:layout_marginLeft="85dp"
+                android:layout_marginLeft="65dp"
                 android:text="@string/warning"
+                android:textColor="@color/color_red"
                 android:textSize="@dimen/tuto_text" />
 
         </LinearLayout>
