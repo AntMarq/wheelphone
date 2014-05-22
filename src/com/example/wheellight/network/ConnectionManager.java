@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-import android.util.Log;
-
 public class ConnectionManager
 {
 	Socket clientSocket;
