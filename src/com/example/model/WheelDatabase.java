@@ -135,5 +135,31 @@ public class WheelDatabase
         values.put("image",photo);     
         db.update("map", values, "_id =" + map.getIdmap(), null); 
 	}
+	
+	public void insertMapInDB(GameMap map , byte[] photo, String title)
+	{
+		SQLiteDatabase db = helper.getWritableDatabase();
+		ContentValues values = new ContentValues();
+		//remove [ ] && space
+    	String cleanStructure = map.getMapStructure().toString().replaceAll("\\[", "").replaceAll("\\]","").replaceAll(" ", "");
+		values.put("structure", cleanStructure);
+        values.put("image",photo);   
+        values.put("title", title);
+        db.insert("map", null, values); 
+	}
+	
+	public boolean CheckTitleMap (String title)
+	{
+		Log.v(tag, "title = " + title);
+		SQLiteDatabase db = helper.getReadableDatabase();
+        Cursor mCursor = db.rawQuery("SELECT * FROM " + "map " + "WHERE title ='" + title + "'", null);  
+        if (mCursor != null) {  
+            if(mCursor.getCount() > 0)  
+            {  
+                return true;  
+            }  
+        }  
+        return false; 
+	}
 
 }

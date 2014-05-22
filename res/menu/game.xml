@@ -7,4 +7,11 @@
         android:showAsAction="ifRoom"
         android:icon="@drawable/ic_action_save"
         android:title="@string/savemap"/>
+	
+	<item
+        android:id="@+id/addmap"
+        android:orderInCategory="4"
+        android:showAsAction="ifRoom"
+        android:icon="@drawable/plus"
+        android:title="@string/addmap"/>
 </menu>

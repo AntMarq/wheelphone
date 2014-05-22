@@ -27,12 +27,7 @@ public class WheelDatabaseHelper extends SQLiteOpenHelper  {
 				"image BLOB" +
 				")");
 		
-		db.execSQL("CREATE TABLE IF NOT EXISTS mapgame (" +
-				"_id INTEGER PRIMARY KEY," +
-				"title TEXT," +
-				"structure TEXT," +
-				"image BLOB" +
-				")");
+	
 		
 		db.execSQL("INSERT INTO map (title,structure) VALUES ('map1_Demo','Start,None,None,None,None,None,None,None,None,None,None,None,None,None,None,None,None,None,None,None,None,None,None,None,End')");
 	/*	db.execSQL("INSERT INTO map (title,structure) VALUES ('map2_Demo','Start,Blue,Blue,None,None,"

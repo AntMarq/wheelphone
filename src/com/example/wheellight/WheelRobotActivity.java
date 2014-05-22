@@ -35,7 +35,8 @@ public class WheelRobotActivity extends FragmentActivity{
 			
 			@Override
 			public void onClick(View v) {
-				
+				//Intent i = new Intent(WheelRobotActivity.this, PlayActivity.class);
+				//startActivity(i);
 				Toast.makeText(getApplicationContext(), getResources().getString(R.string.play_msg), Toast.LENGTH_SHORT).show();
 			}
 		});
