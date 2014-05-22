@@ -18,10 +18,8 @@ import android.net.wifi.p2p.WifiP2pManager;
 import android.net.wifi.p2p.WifiP2pManager.Channel;
 import android.net.wifi.p2p.WifiP2pManager.ConnectionInfoListener;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 
-import com.example.wheelbrain.MainActivity.Move;
 import com.example.wheelbrain.network.ConnectionManager;
 import com.example.wheelbrain.network.IConnectionManagerListener;
 import com.example.wheelbrain.network.IRequestListener;
@@ -87,7 +85,7 @@ IWifiP2PListener, IConnectionManagerListener, ConnectionInfoListener, IRequestLi
 		if(progressDialog != null && progressDialog.isShowing())
 			progressDialog.dismiss();
 		
-		progressDialog = ProgressDialog.show(this, "Please wait", "Awaiting connection from server...", true);
+		progressDialog = ProgressDialog.show(this, "Please wait", "Awaiting p2p request from server...", true);
 		progressDialog.setCancelable(true);
 		progressDialog.setOnCancelListener(new OnCancelListener()
 		{
@@ -163,7 +161,7 @@ IWifiP2PListener, IConnectionManagerListener, ConnectionInfoListener, IRequestLi
 				
 				ConnectionManager.getInstance().INetHost = _info.groupOwnerAddress;
 				ConnectionManager.getInstance().tryConnection(this);
-				progressDialog = ProgressDialog.show(this, "Socket", "Connecting to the server.", true);
+				progressDialog = ProgressDialog.show(this, "Please wait", "Trying to reach the server...", true);
 				progressDialog.setCancelable(true);
 				progressDialog.setOnCancelListener(new OnCancelListener()
 				{
@@ -262,7 +260,7 @@ IWifiP2PListener, IConnectionManagerListener, ConnectionInfoListener, IRequestLi
 		if(progressDialog != null && progressDialog.isShowing())
 			progressDialog.dismiss();
 		
-		progressDialog = ProgressDialog.show(this, "Socket", "Waiting for server instructions.", true);
+		progressDialog = ProgressDialog.show(this, "Please wait", "Waiting for server...", true);
 		progressDialog.setCancelable(true);
 		progressDialog.setOnCancelListener(new OnCancelListener()
 		{

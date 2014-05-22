@@ -309,4 +309,10 @@ public class RequestManager
 		Request rq = new Request(ERequestType.Welcome , "");
 		sendRequest(rq);
 	}
+	
+	public void sendInstructionComplete(Instruction _instruction)
+	{
+		Request rq = new Request(ERequestType.Complete, _instruction.toJson().toString());
+		sendRequest(rq);
+	}
 }

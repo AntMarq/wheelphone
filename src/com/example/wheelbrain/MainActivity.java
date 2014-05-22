@@ -235,8 +235,9 @@ public class MainActivity extends Activity implements WheelPhoneRobotListener, I
 						
 						if(wheelphone.getOdometryX() > 200 || wheelphone.getOdometryX() < -200 ||
 						   wheelphone.getOdometryY() > 200 || wheelphone.getOdometryY() < -200) {
-							
+							RequestManager.getInstance().sendInstructionComplete(commandsArray.get(curCommandIndex));
 							stopWheelphone();
+							
 						}
 						break;
 					case Left:
@@ -246,6 +247,7 @@ public class MainActivity extends Activity implements WheelPhoneRobotListener, I
 						wheelphone.setSpeed(lSpeed, rSpeed);
 						
 						if(Math.toDegrees(wheelphone.getOdometryTheta()) > 89) {
+							RequestManager.getInstance().sendInstructionComplete(commandsArray.get(curCommandIndex));
 							stopWheelphone();
 						}
 						break;
@@ -256,6 +258,7 @@ public class MainActivity extends Activity implements WheelPhoneRobotListener, I
 						wheelphone.setSpeed(lSpeed, rSpeed);
 						
 						if(Math.toDegrees(wheelphone.getOdometryTheta()) < -89) {
+							RequestManager.getInstance().sendInstructionComplete(commandsArray.get(curCommandIndex));
 							stopWheelphone();
 						}
 						break;
@@ -267,7 +270,7 @@ public class MainActivity extends Activity implements WheelPhoneRobotListener, I
 						
 						soundPlayer = MediaPlayer.create(MainActivity.this, R.raw.win );
 						soundPlayer.start();
-						
+						RequestManager.getInstance().sendInstructionComplete(commandsArray.get(curCommandIndex));
 						commandsArray.clear();
 						curCommandIndex = 0;
 						break;
@@ -279,7 +282,7 @@ public class MainActivity extends Activity implements WheelPhoneRobotListener, I
 						
 						soundPlayer = MediaPlayer.create(MainActivity.this, R.raw.lose );
 						soundPlayer.start();
-						
+						RequestManager.getInstance().sendInstructionComplete(commandsArray.get(curCommandIndex));
 						commandsArray.clear();
 						curCommandIndex = 0;
 						break;
@@ -289,7 +292,7 @@ public class MainActivity extends Activity implements WheelPhoneRobotListener, I
 			}
 		} else {
 			if(progressDialog == null || !progressDialog.isShowing()) {
-				progressDialog = ProgressDialog.show(this, "Socket", "Receiving instructions", true);
+				progressDialog = ProgressDialog.show(this, "Please wait", "Waiting for instructions...", true);
 				progressDialog.setCancelable(false);
 			}
 		}
