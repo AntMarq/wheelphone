@@ -293,12 +293,12 @@ public class GameFragment extends Fragment{
 					
 				Log.v(tag, "sendStructure = " + sendStructure.toString());
 				
-				Connectivity_Fragment gameFragment = new Connectivity_Fragment();  
+				Connectivity_Fragment conFragment = new Connectivity_Fragment();  
 				Bundle bdl = new Bundle();
 				bdl.putSerializable("instruction", sendStructure);
-					
+				conFragment.setArguments(bdl);
 		        getFragmentManager().beginTransaction()
-		                .replace(R.id.mainfragment, gameFragment)
+		                .replace(R.id.mainfragment, conFragment)
 		                .addToBackStack(null)
 		                .commit();	
 			}

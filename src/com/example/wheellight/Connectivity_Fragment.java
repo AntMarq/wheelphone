@@ -1,9 +1,10 @@
 package com.example.wheellight;
 
+import instructions.Instruction;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
@@ -21,7 +22,6 @@ import android.net.wifi.p2p.WifiP2pManager.Channel;
 import android.net.wifi.p2p.WifiP2pManager.ConnectionInfoListener;
 import android.net.wifi.p2p.WifiP2pManager.PeerListListener;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -61,12 +61,15 @@ IWifiP2PListener, PeerListListener, IConnectionManagerListener, ConnectionInfoLi
 	
 	WifiP2pInfo info;
 	
+	ArrayList<Instruction> instrus;
+	
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
 	{
 		RequestManager.getInstance().delegate = this;
 		View view = inflater.inflate(getResources().getLayout(R.layout.connectivity_fragment), container, false);
 		context = (WheelLightApp) getActivity().getApplicationContext();
 		Bundle b = getArguments();
+		instrus = (ArrayList<Instruction>)b.getSerializable("instruction");
 		mListView = (ListView)view.findViewById(R.id.connection_list);
 		mListView.setAdapter(new DeviceP2PAdapter());
 		mListView.setOnItemClickListener(new OnItemClickListener()
@@ -531,6 +534,7 @@ IWifiP2PListener, PeerListListener, IConnectionManagerListener, ConnectionInfoLi
 							requestQuit();
 					}
 				});
+				RequestManager.getInstance().sendInstructions(instrus);
 		    }
 		});
 	
