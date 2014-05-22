@@ -296,9 +296,9 @@ IWifiP2PListener, IConnectionManagerListener, ConnectionInfoListener, IRequestLi
 			@Override
 			public void run()
 			{
-				finish();
 				Intent intent = new Intent(act, MainActivity.class);
 				startActivity(intent);
+				finish();
 			}
 		});
 	}

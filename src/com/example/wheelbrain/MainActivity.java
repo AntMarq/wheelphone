@@ -20,6 +20,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.wheelbrain.network.IRequestListener;
 import com.example.wheelbrain.network.RequestManager;
@@ -347,8 +348,6 @@ public class MainActivity extends Activity implements WheelPhoneRobotListener, I
 	@Override
 	public void onFarewellSent()
 	{
-		Intent intent = new Intent(this, ConnectionActivity.class);
-		startActivity(intent);
 		finish();
 	}
 

@@ -32,7 +32,7 @@ public class ConnectionTask extends AsyncTask<Void, Void, Void>
 			{
 				try
 				{
-					Thread.sleep(500 * error_count);
+					Thread.sleep(500);
 					error_count++;
 				} catch (InterruptedException e1)
 				{
