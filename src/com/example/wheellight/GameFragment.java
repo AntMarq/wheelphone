@@ -106,11 +106,11 @@ public class GameFragment extends Fragment{
 	//	userInfo.setText(Html.fromHtml("Selectionner une couleur en cliquant sur le pot de peinture <br /><br /> Remplisser la grille avec la couleur de votre choix <br /><br /> &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp et/ou <br /><br /> Saisisser la squence de mouvement en fonction de la couleur selectionne"));
 	//	userInfo.setBackgroundColor(getResources().getColor(R.color.white));
 		
-		if(selectColor.getBackground() != null)
-		{
+		
+			Log.v(tag, "resetColor");
 			selectColor.setImageResource(R.drawable.no_color);
 			setColorInChild = 0;
-		}
+		
 		/**
 		 * Load map structure in DB
 		 */

@@ -35,7 +35,12 @@
      <string name="help">Besoin d\'aide ?</string>
      <string name="objectifText">Objectif</string>
      <string name="objectif">Définissez le parcours qu\'effectuera votre robot pour atteindre son objectif</string>
-     <string name="warning">Placer l\'avant du robot dans le sens de la flèche indiqué sur l\'icone du robot</string>
+     <string name="warning">Placer l\'avant du robot dans le sens de la flèche indiquée sur l\'icone du robot</string>
+     
+     <string name="etape3_1">Sélectionnez une couleur</string>
+     <string name="etape3_2">Utilisez les flèches pour définir les instructions de la couleur sélectionnée</string>
+     <string name="etape3_3"></string>
+     
 
      
             
