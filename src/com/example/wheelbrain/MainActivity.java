@@ -1,6 +1,7 @@
 package com.example.wheelbrain;
 
 import instructions.Instruction;
+import instructions.Instruction.EInstructionType;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -10,16 +11,17 @@ import java.util.ArrayList;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.DialogInterface.OnCancelListener;
+import android.media.MediaPlayer;
+import android.media.MediaPlayer.OnCompletionListener;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.wheelbrain.network.IRequestListener;
 import com.example.wheelbrain.network.RequestManager;
@@ -28,6 +30,9 @@ import com.wheelphone.wheelphonelibrary.WheelphoneRobot.WheelPhoneRobotListener;
 
 public class MainActivity extends Activity implements WheelPhoneRobotListener, IRequestListener
 {
+	//sound
+	MediaPlayer soundPlayer = new MediaPlayer();
+	
 	//config
 	private Context context;
 	WheelphoneRobot wheelphone;
@@ -61,8 +66,8 @@ public class MainActivity extends Activity implements WheelPhoneRobotListener, I
 	}
 	
 	//commands Array
-	private Move[] commandsArray = { Move.FORWARD, Move.LEFT, Move.FORWARD, Move.LEFT, Move.FORWARD, Move.LEFT, Move.FORWARD };
-	private Move curCommand;
+	private ArrayList<Instruction> commandsArray = new ArrayList<Instruction>(); // = { Move.FORWARD, Move.LEFT, Move.FORWARD, Move.LEFT, Move.FORWARD, Move.LEFT, Move.FORWARD };
+	private Instruction curCommand;
 	private int curCommandIndex	 = 0;
 	
 	//state methods -------------------------------------------------------------------------------
@@ -74,6 +79,13 @@ public class MainActivity extends Activity implements WheelPhoneRobotListener, I
 		setContentView(R.layout.activity_main);
 		
 		context = this.getApplicationContext();
+		/*
+		commandsArray.add(new Instruction(EInstructionType.Start));
+		commandsArray.add(new Instruction(EInstructionType.Right));
+		commandsArray.add(new Instruction(EInstructionType.Right));
+		commandsArray.add(new Instruction(EInstructionType.Forward));
+		commandsArray.add(new Instruction(EInstructionType.Win));
+		*/
 		
 		batteryVoltage   = (TextView)findViewById(R.id.batteryVoltage);
 		connectionState  = (TextView)findViewById(R.id.connectionState);
@@ -107,6 +119,14 @@ public class MainActivity extends Activity implements WheelPhoneRobotListener, I
             		moveStateSwitch.setText("Start");
             	}
         	}
+        });
+        
+        //release when end playing
+        soundPlayer.setOnCompletionListener(new OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mp) {
+                soundPlayer.release();
+            }
         });
 	}
 
@@ -155,6 +175,12 @@ public class MainActivity extends Activity implements WheelPhoneRobotListener, I
     	wheelphone.setWheelPhoneRobotListener(null);
     }
     
+    // Get / Set ----------------------------------------------------------------------------------
+    /*
+    public void setCommandsArray(Move[] commandsArray) {
+		this.commandsArray = commandsArray;
+	}
+    */
     // Wheelbot methods ---------------------------------------------------------------------------
     
     //Update method -----------------------------
@@ -162,7 +188,7 @@ public class MainActivity extends Activity implements WheelPhoneRobotListener, I
 	@Override
 	public void onWheelphoneUpdate()
 	{
-		Log.v(TAG, "onWheelphoneUpdate");
+		//Log.v(TAG, "onWheelphoneUpdate");
 		
 		if(getFirmwareFlag) {
 			firmwareVersion=wheelphone.getFirmwareVersion();
@@ -197,17 +223,25 @@ public class MainActivity extends Activity implements WheelPhoneRobotListener, I
 		//show wheels speeed infos
 		wheelsSpeed.setText("lSpeed : " + lSpeed + "mm/s | rSpeed : " + rSpeed +"mm/s");
 		
+		//read start instruction
+		
+		if(commandsArray.size() > 0 && commandsArray.get(curCommandIndex).type == EInstructionType.Start) {
+			isMoving = true;
+			curCommandIndex++;	
+		}
+		
 		if(isConnect && isMoving) {
-			if(curCommandIndex < commandsArray.length) {
+			if(curCommandIndex < commandsArray.size()) {
 				if(moveIsEnded) {
 					wheelphone.resetOdometry();
 				}
 				moveIsEnded = false;
 				
-				curCommand = commandsArray[curCommandIndex];
+				curCommand = commandsArray.get(curCommandIndex);
 				
-				switch(curCommand) {
-				case FORWARD:
+				switch(curCommand.type) {
+				
+				case Forward:
 					rSpeed = 100;
 					lSpeed = 100;
 					
@@ -225,7 +259,7 @@ public class MainActivity extends Activity implements WheelPhoneRobotListener, I
 						stopWheelphone();
 					}
 					break;
-				case LEFT:
+				case Left:
 					lSpeed = 0;
 					rSpeed = 50;
 					
@@ -235,15 +269,37 @@ public class MainActivity extends Activity implements WheelPhoneRobotListener, I
 						stopWheelphone();
 					}
 					break;
-				case RIGHT:
+				case Right:
 					lSpeed = 50;
-					lSpeed = 0;
+					rSpeed = 0;
 					
 					wheelphone.setSpeed(lSpeed, rSpeed);
 					
 					if(Math.toDegrees(wheelphone.getOdometryTheta()) < -89) {
 						stopWheelphone();
 					}
+					break;
+				case Win:
+					lSpeed = 0;
+					rSpeed = 0;
+					
+					wheelphone.setSpeed(lSpeed, rSpeed);
+					
+					soundPlayer = MediaPlayer.create(MainActivity.this, R.raw.win );
+					soundPlayer.start();
+					
+					//TODO playsound
+					break;
+				case Lose:
+					lSpeed = 0;
+					rSpeed = 0;
+					
+					wheelphone.setSpeed(lSpeed, rSpeed);
+					
+					soundPlayer = MediaPlayer.create(MainActivity.this, R.raw.lose );
+					soundPlayer.start();
+					
+					//TODO playsound
 					break;
 				}
 				
@@ -262,11 +318,7 @@ public class MainActivity extends Activity implements WheelPhoneRobotListener, I
 		rSpeed = 0;
 		
 		wheelphone.setSpeed(lSpeed, rSpeed);
-		/*
-		if(curCommand == Move.FORWARD) {
-			deltaAngle = Math.toDegrees(wheelphone.getOdometryTheta());
-		}
-		*/
+
 		moveIsEnded = true;
 		curCommandIndex++;
 	}
@@ -327,7 +379,7 @@ public class MainActivity extends Activity implements WheelPhoneRobotListener, I
 	@Override
 	public void onInstructionReceived(ArrayList<Instruction> _instrus)
 	{
-		//TODO Do your stuff here with the instructions. -- bitch --
+		commandsArray = _instrus;
 	}
 
 	@Override

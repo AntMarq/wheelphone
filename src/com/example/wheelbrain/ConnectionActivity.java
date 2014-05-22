@@ -18,8 +18,10 @@ import android.net.wifi.p2p.WifiP2pManager;
 import android.net.wifi.p2p.WifiP2pManager.Channel;
 import android.net.wifi.p2p.WifiP2pManager.ConnectionInfoListener;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 
+import com.example.wheelbrain.MainActivity.Move;
 import com.example.wheelbrain.network.ConnectionManager;
 import com.example.wheelbrain.network.IConnectionManagerListener;
 import com.example.wheelbrain.network.IRequestListener;
@@ -40,6 +42,7 @@ IWifiP2PListener, IConnectionManagerListener, ConnectionInfoListener, IRequestLi
 	boolean isWifiPaired = false;
 	
 	WifiP2pInfo info;
+	private String TAG = "wheelbrain";
 	
 	int dialogCount = 0;
 	
@@ -285,6 +288,7 @@ IWifiP2PListener, IConnectionManagerListener, ConnectionInfoListener, IRequestLi
 	@Override
 	public void onInstructionReceived(ArrayList<Instruction> _instrus)
 	{
+		
 	}
 
 	@Override

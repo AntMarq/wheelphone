@@ -20,6 +20,20 @@ public class Instruction
 	
 	public EInstructionType type;
 	
+	// Constructor
+	
+	public Instruction()
+	{
+		
+	}
+	
+	public Instruction(EInstructionType _type)
+	{
+		type = _type;
+	}
+
+	// Method
+	
 	public static Instruction newFromJson(JSONObject object)
 	{
 		Instruction instru = new Instruction();
@@ -75,5 +89,10 @@ public class Instruction
 		}
 		
 		return instrus;
+	}
+	
+	@Override
+	public String toString() {
+		return ""+type;
 	}
 }
