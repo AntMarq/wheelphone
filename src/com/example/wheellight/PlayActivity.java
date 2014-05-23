@@ -11,7 +11,7 @@ public class PlayActivity extends FragmentActivity{
 	{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.play_activity);
-	
+		WheelRobotActivity.idbuttonselect = R.id.playfragment;
 		ChooseMapFragment chooseFragment = new ChooseMapFragment(); 
 		Bundle bundle = new Bundle();
 		bundle.putString("typeofgame", "play");

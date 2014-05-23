@@ -12,10 +12,10 @@ public class TutorielActivity extends FragmentActivity {
 	{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.tutoriel_activity);
-		
+		WheelRobotActivity.idbuttonselect = R.id.tutofragment;
 		TutorielFragment tutoFragment = new TutorielFragment();       
         getSupportFragmentManager().beginTransaction()
-                .replace(R.id.tutofragment, tutoFragment)
+                .replace(WheelRobotActivity.idbuttonselect, tutoFragment)
                 .addToBackStack(null)
                 .commit();
 	

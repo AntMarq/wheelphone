@@ -11,6 +11,7 @@ import android.widget.Toast;
 public class WheelRobotActivity extends FragmentActivity{
 	
 	private Button play, demo, tuto;
+	public static int idbuttonselect;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
@@ -27,6 +28,7 @@ public class WheelRobotActivity extends FragmentActivity{
 			@Override
 			public void onClick(View v) {
 				Intent i = new Intent(WheelRobotActivity.this, TutorielActivity.class);
+			
 				startActivity(i); 
 			}
 		});
@@ -35,9 +37,10 @@ public class WheelRobotActivity extends FragmentActivity{
 			
 			@Override
 			public void onClick(View v) {
-				//Intent i = new Intent(WheelRobotActivity.this, PlayActivity.class);
-				//startActivity(i);
-				Toast.makeText(getApplicationContext(), getResources().getString(R.string.play_msg), Toast.LENGTH_SHORT).show();
+				Intent i = new Intent(WheelRobotActivity.this, PlayActivity.class);
+			
+				startActivity(i);
+				//Toast.makeText(getApplicationContext(), getResources().getString(R.string.play_msg), Toast.LENGTH_SHORT).show();
 			}
 		});
 		

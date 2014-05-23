@@ -60,7 +60,7 @@ public class TutorielFragment extends Fragment{
 		b.putInt("image", i);
 		frag.setArguments(b);	
 		FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
-		ft.replace(R.id.tutofragment,frag,"DisplayFullImage_Fragment");
+		ft.replace(WheelRobotActivity.idbuttonselect,frag,"DisplayFullImage_Fragment");
 		ft.addToBackStack(null).commit();
 	}
 }

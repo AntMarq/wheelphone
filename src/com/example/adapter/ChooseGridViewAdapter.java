@@ -4,6 +4,7 @@ package com.example.adapter;
 import java.util.ArrayList;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -47,7 +48,7 @@ public class ChooseGridViewAdapter extends BaseAdapter {
 	@Override
 	public View getView(final int position, View convertView, ViewGroup parent) {
 		
-		
+		//Log.v("choose adapter", "getView");
 		ViewHolder holder;
 		GameMap objData = ((GameMap)(listMap.get (position)));
 		
@@ -67,7 +68,7 @@ public class ChooseGridViewAdapter extends BaseAdapter {
         }
        
         holder.title.setText(objData.getName());
-        
+      //  holder.imageView.setImageBitmap(objData.getImage());
         
         return convertView;
 	}

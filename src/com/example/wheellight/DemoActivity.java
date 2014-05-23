@@ -14,7 +14,8 @@ public class DemoActivity extends FragmentActivity
 	{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-	
+		WheelRobotActivity.idbuttonselect = R.id.mainfragment;
+
 		GameFragment gameFragment = new GameFragment();       
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.mainfragment, gameFragment)

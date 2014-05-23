@@ -1,17 +1,11 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
 
 
-	<item
-        android:id="@+id/savemap"
-        android:orderInCategory="5"
-        android:showAsAction="ifRoom"
-        android:icon="@drawable/ic_action_save"
-        android:title="@string/savemap"/>
 	
 	<item
         android:id="@+id/addmap"
         android:orderInCategory="4"
         android:showAsAction="ifRoom"
-        android:icon="@drawable/plus"
+        android:icon="@android:drawable/ic_menu_add"
         android:title="@string/addmap"/>
 </menu>

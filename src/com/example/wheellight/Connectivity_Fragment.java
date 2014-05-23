@@ -78,10 +78,10 @@ IWifiP2PListener, PeerListListener, IConnectionManagerListener, ConnectionInfoLi
 			if(RequestManager.getInstance().isInit())
 			{
 				RequestManager.getInstance().sendInstructions(instrus);
-				
+			
 				FeedbackFragment feedbackFragment = new FeedbackFragment();
 		        getFragmentManager().beginTransaction()
-		                .replace(R.id.mainfragment, feedbackFragment)
+		                .replace(WheelRobotActivity.idbuttonselect, feedbackFragment)
 		                .addToBackStack(null)
 		                .commit();	
 			}
@@ -558,7 +558,7 @@ IWifiP2PListener, PeerListListener, IConnectionManagerListener, ConnectionInfoLi
 				RequestManager.getInstance().sendInstructions(instrus);
 				FeedbackFragment feedbackFragment = new FeedbackFragment();
 		        getFragmentManager().beginTransaction()
-		                .replace(R.id.mainfragment, feedbackFragment)
+		                .replace(WheelRobotActivity.idbuttonselect, feedbackFragment)
 		                .addToBackStack(null)
 		                .commit();	
 		    }

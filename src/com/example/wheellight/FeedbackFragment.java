@@ -76,7 +76,6 @@ public class FeedbackFragment extends Fragment implements IOrderCompleteListener
 		 */
 		gridview = (GridView)view.findViewById(R.id.game_gridview);
 		adapter = new FeedbackGridViewAdapter(getActivity().getApplicationContext(), size, baseStructureMap);
-		gridview.setDrawingCacheEnabled(true);
 		gridview.setAdapter(adapter);		
 		
 		return view;
@@ -94,15 +93,31 @@ public class FeedbackFragment extends Fragment implements IOrderCompleteListener
 
 	private void LoadMapInSharePreferences()
 	{
-		idMapSelect = sh_Pref.getInt("id", 0); // getting int
-		if(idMapSelect != 0)
-		{		
-			mapSelect = db.getSelectMap(idMapSelect);		
+		 // getting int
+		if(WheelRobotActivity.idbuttonselect == R.id.mainfragment)
+		{idMapSelect = sh_Pref.getInt("id", 0);
+			if(idMapSelect != 0)
+			{		
+				mapSelect = db.getSelectMap(idMapSelect);		
+			}
+			else
+			{
+				mapSelect = db.getSelectMap(1);
+			}
 		}
 		else
 		{
-			mapSelect = db.getSelectMap(1);
+			idMapSelect = sh_Pref.getInt("idplay", 0);
+			if(idMapSelect != 0)
+			{		
+				mapSelect = db.getSelectMapGame(idMapSelect);		
+			}
+			else
+			{
+				mapSelect = db.getSelectMapGame(1);
+			}
 		}
+		
 	}
 
 

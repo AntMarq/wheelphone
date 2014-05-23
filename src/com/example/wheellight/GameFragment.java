@@ -6,10 +6,7 @@ import instructions.Instruction.EInstructionType;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import android.app.AlertDialog.Builder;
 import android.app.Dialog;
-import android.content.Context;
-import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.graphics.Bitmap;
@@ -18,18 +15,13 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -69,6 +61,8 @@ public class GameFragment extends Fragment{
 	ArrayList<TypeOfCell> structureMap;
 	ArrayList<Instruction> sendStructure;
 	
+	Bundle bdl;
+	
 	int gridIndex = 0;
 	//curDirection  1 = right | 2 = down | 3 = up | 4 = left
 	int curDirection = 1;
@@ -79,14 +73,10 @@ public class GameFragment extends Fragment{
 		Log.v(tag, "onCreateView");
 		
 		View view = inflater.inflate(getResources().getLayout(R.layout.game_fragment), container, false);
-		setHasOptionsMenu(true);
 		db = WheelDatabase.getInstance(getActivity().getApplicationContext());
-		sh_Pref = getActivity().getSharedPreferences("WheelLight", 0);		
-		if(sh_Pref!= null)
-		{
-			Editor toEdit = sh_Pref.edit();
-			LoadMapInSharePreferences();
-		}
+		sh_Pref = getActivity().getSharedPreferences("WheelLight", 0);	
+		bdl = this.getArguments();
+		
 
 	//	userInfo = (TextView)view.findViewById(R.id.notice);
 		startGame = (Button)view.findViewById(R.id.startbutton);
@@ -108,6 +98,12 @@ public class GameFragment extends Fragment{
 		up = (ImageButton)view.findViewById(R.id.imageButtonUp);
 		right = (ImageButton)view.findViewById(R.id.imageButtonRight);
 		
+		if(sh_Pref!= null)
+		{
+			Editor toEdit = sh_Pref.edit();
+			LoadMapInSharePreferences();
+		}
+		
 			Log.v(tag, "resetColor");
 			selectColor.setImageResource(R.drawable.no_color);
 			setColorInChild = 0;
@@ -115,7 +111,9 @@ public class GameFragment extends Fragment{
 		/**
 		 * Load map structure in DB
 		 */
+			
 		structureMap = mapSelect.getMapStructure();
+			
 		
 ///////////////////////////////////////////////////////////////////////////
 ///////////////////// Show Tutorial Fragment  /////////////////////////////
@@ -132,7 +130,7 @@ public class GameFragment extends Fragment{
 				saveMapInGridView();
 				TutorielFragment gameFragment = new TutorielFragment();  			
 		        getFragmentManager().beginTransaction()
-		                .replace(R.id.mainfragment, gameFragment)
+		                .replace(WheelRobotActivity.idbuttonselect, gameFragment)
 		                .addToBackStack(null)
 		                .commit();	
 			}
@@ -242,45 +240,48 @@ public class GameFragment extends Fragment{
  * 	GridView adapter && selectColor		
  */
 		gridview = (GridView)view.findViewById(R.id.game_gridview);
+
 		adapter = new MapGridViewAdapter(getActivity().getApplicationContext(), size, mapSelect);
 		gridview.setDrawingCacheEnabled(true);
 		gridview.setAdapter(adapter);		
-		gridview.setOnItemClickListener(new OnItemClickListener() {
-
-			@Override
-			public void onItemClick(AdapterView<?> parent, View view,int position, long id) {
-				
-				if(position == 0 || position == 24){
-					//nothing
-				}
-				else
-				{	
-					switch(setColorInChild) 
-					{
-				    case R.color.dark_blue:
-				    	structureMap.set(position,TypeOfCell.Blue);
-				        break;
-				    case R.color.beige:
-				    	structureMap.set(position,TypeOfCell.Beige);
-				        break;
-				    case R.color.noir:
-				    	structureMap.set(position,TypeOfCell.Black);
-				        break;
-				    case R.color.green:
-				    	structureMap.set(position,TypeOfCell.Green);
-				        break;
-				    case R.color.grisclair:
-				    	structureMap.set(position,TypeOfCell.None);
-				        break;
-				    case R.color.color_red:
-				    	structureMap.set(position,TypeOfCell.Red);
-				        break;
+		if(WheelRobotActivity.idbuttonselect == R.id.mainfragment)
+		{
+			gridview.setOnItemClickListener(new OnItemClickListener() {
+	
+				@Override
+				public void onItemClick(AdapterView<?> parent, View view,int position, long id) {
+					
+					if(position == 0 || position == 24){
+						//nothing
 					}
+					else
+					{	
+						switch(setColorInChild) 
+						{
+					    case R.color.dark_blue:
+					    	structureMap.set(position,TypeOfCell.Blue);
+					        break;
+					    case R.color.beige:
+					    	structureMap.set(position,TypeOfCell.Beige);
+					        break;
+					    case R.color.noir:
+					    	structureMap.set(position,TypeOfCell.Black);
+					        break;
+					    case R.color.green:
+					    	structureMap.set(position,TypeOfCell.Green);
+					        break;
+					    case R.color.grisclair:
+					    	structureMap.set(position,TypeOfCell.None);
+					        break;
+					    case R.color.color_red:
+					    	structureMap.set(position,TypeOfCell.Red);
+					        break;
+						}
+					}
+					adapter.notifyDataSetChanged();
 				}
-				adapter.notifyDataSetChanged();
-			}
-		});
-		
+			});
+		}
 ///////////////////////////////////////////////////////////////////////////
 /////////////////////Send Instruction to Connectivity Fragment/////////////
 ///////////////////////////////////////////////////////////////////////////
@@ -292,17 +293,19 @@ public class GameFragment extends Fragment{
 				saveMapInGridView();
 				sendInstructions();
 					
-				Log.v(tag, "sendStructure = " + sendStructure.toString());
-				
-				
-				Connectivity_Fragment conFragment = new Connectivity_Fragment();  
-				Bundle bdl = new Bundle();
-				bdl.putSerializable("instruction", sendStructure);
-				conFragment.setArguments(bdl);
-		        getFragmentManager().beginTransaction()
-		                .replace(R.id.mainfragment, conFragment)
-		                .addToBackStack(null)
-		                .commit();	
+			/*	Log.v(tag, "sendStructure = " + sendStructure.toString());
+				if(bdl != null)
+				{
+					if(bdl.getString("typeofgame").equalsIgnoreCase("play"))
+					{*/
+						Connectivity_Fragment conFragment = new Connectivity_Fragment();  
+						Bundle bdl = new Bundle();
+						bdl.putSerializable("instruction", sendStructure);
+						conFragment.setArguments(bdl);
+				        getFragmentManager().beginTransaction()
+				                .replace(WheelRobotActivity.idbuttonselect, conFragment)
+				                .addToBackStack(null)
+				        .commit();
 			}
 		});
 		
@@ -310,14 +313,14 @@ public class GameFragment extends Fragment{
 		{	
 			@Override
 			public void onClick(View v) {
-				//saveMapInGridView();
+				saveMapInGridView();
 				
 				ChooseMapFragment chooseMapFragment = new ChooseMapFragment(); 
 				Bundle bundle = new Bundle();
 				bundle.putString("typeofgame", "demo");
 				chooseMapFragment.setArguments(bundle);
 		        getFragmentManager().beginTransaction()
-		                .replace(R.id.mainfragment, chooseMapFragment)
+		                .replace(WheelRobotActivity.idbuttonselect, chooseMapFragment)
 		                .addToBackStack("connection")
 		                .commit();					
 			}
@@ -328,80 +331,57 @@ public class GameFragment extends Fragment{
 
 	private void LoadMapInSharePreferences()
 	{
-		idMapSelect = sh_Pref.getInt("id", 0); // getting int
-		if(idMapSelect != 0)
-		{		
-			mapSelect = db.getSelectMap(idMapSelect);		
+	
+		if(bdl != null)
+		{
+			if(bdl.getString("typeofgame") != null)
+			{
+				if(bdl.getString("typeofgame").equalsIgnoreCase("play"))
+				{
+					
+					choosemap.setVisibility(View.INVISIBLE);
+					idMapSelect = sh_Pref.getInt("idplay", 0); // getting int
+					Log.v(tag, "PLAY !!!!" + idMapSelect);
+					if(idMapSelect != 0)
+					{		
+						mapSelect = db.getSelectMapGame(idMapSelect);
+						
+					}
+					else
+					{
+						mapSelect = db.getSelectMapGame(1);
+					}
+				}
+				else
+				{
+					Log.v(tag, "demo !!!!");
+					idMapSelect = sh_Pref.getInt("id", 0); // getting int
+					if(idMapSelect != 0)
+					{		
+						mapSelect = db.getSelectMap(idMapSelect);		
+					}
+					else
+					{
+						mapSelect = db.getSelectMap(1);
+					}
+				}
+			}
+			
 		}
 		else
 		{
-			mapSelect = db.getSelectMap(1);
-		}
+			Log.v(tag, "demo !!!!");
+			idMapSelect = sh_Pref.getInt("id", 0); // getting int
+			if(idMapSelect != 0)
+			{		
+				mapSelect = db.getSelectMap(idMapSelect);		
+			}
+			else
+			{
+				mapSelect = db.getSelectMap(1);
+			}
+		}	
 	}
-	
-	@Override
-	public void onCreateOptionsMenu (Menu menu, MenuInflater inflater)
-	{
-		inflater.inflate (R.menu.game, menu);		
-	}
-	
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) 
-	{
-		if(item.getItemId() == R.id.savemap)
-		{
-			saveMapInGridView();
-			Toast.makeText(getActivity(),"Carte mise à jour", Toast.LENGTH_SHORT).show();
-		}
-		else if(item.getItemId() == R.id.addmap)
-		{
-			Builder builder = new Builder(getActivity());
-	        final EditText input = new EditText(getActivity());
-	        builder
-	            .setTitle("Saisissez votre titre")					            
-	            .setView(input)	          
-	            .setPositiveButton("Ok", new DialogInterface.OnClickListener() 
-	            {
-	                public void onClick(DialogInterface dialog, int which) 
-	                {
-	                	String value = input.getText().toString();
-	                    if (value.trim().length() == 0) 
-	                    {
-	                        Toast.makeText(getActivity(),"Titre non saisi", Toast.LENGTH_SHORT).show();
-	                    } 
-	                    else 
-	                    {
-	                    	
-	                    	if(db.CheckTitleMap(value))
-	                    	{
-	                    		 Toast.makeText(getActivity(),"Titre déjà utilisé", Toast.LENGTH_SHORT).show();
-	                    	}
-	                    	else
-	                    	{
-	                    		Bitmap bm = gridview.getDrawingCache();
-		            			if(bm != null)
-		            			{
-		            			db.insertMapInDB(mapSelect, Utility.getBytes(bm), value);
-		            			}
-	                    	}	                    	
-	                    }
-	                }					               
-	            })
-	        	.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-
-	            public void onClick(DialogInterface dialog, int which) {
-	                InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-	                imm.hideSoftInputFromWindow(input.getWindowToken(), 0);
-	            }
-
-	        });
-
-	        builder.show();
-			
-		}
-		return false;
-	}
-
 
 	private void saveMapInGridView() {
 		
@@ -653,8 +633,7 @@ public class GameFragment extends Fragment{
 		} else {
 			for(int i = 0 ; i < moveSequence.size() ; i++) {
 				if(moveSequence.get(i) == 0) { // forward
-					Log.v(tag, "forward");
-					
+					Log.v(tag, "forward");				
 					switch(curDirection) {
 					case 1 :
 						x++;

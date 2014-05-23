@@ -42,10 +42,12 @@ public class ColorPickerAdapter extends BaseAdapter {
 		} else {
 			imageView = (ImageView) convertView;
 		}
-		if(position == 0)
-		{
-			imageView.setImageResource(R.drawable.search_noarrow);
-			imageView.setPadding(0, 0, 0, 0);
+		if(getCount() == 7){
+			if(position == 0)
+			{
+				imageView.setImageResource(R.drawable.search_noarrow);
+				imageView.setPadding(0, 0, 0, 0);
+			}
 		}
 		imageView.setBackgroundColor(colorList.get(position));
 		imageView.setId(position);
