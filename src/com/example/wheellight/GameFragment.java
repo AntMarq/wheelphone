@@ -6,7 +6,10 @@ import instructions.Instruction.EInstructionType;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import android.app.AlertDialog.Builder;
 import android.app.Dialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.graphics.Bitmap;
@@ -22,9 +25,11 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -102,10 +107,6 @@ public class GameFragment extends Fragment{
 		left = (ImageButton)view.findViewById(R.id.imageButtonLeft);
 		up = (ImageButton)view.findViewById(R.id.imageButtonUp);
 		right = (ImageButton)view.findViewById(R.id.imageButtonRight);
-
-	//	userInfo.setText(Html.fromHtml("Selectionner une couleur en cliquant sur le pot de peinture <br /><br /> Remplisser la grille avec la couleur de votre choix <br /><br /> &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp et/ou <br /><br /> Saisisser la squence de mouvement en fonction de la couleur selectionne"));
-	//	userInfo.setBackgroundColor(getResources().getColor(R.color.white));
-		
 		
 			Log.v(tag, "resetColor");
 			selectColor.setImageResource(R.drawable.no_color);
@@ -309,8 +310,12 @@ public class GameFragment extends Fragment{
 		{	
 			@Override
 			public void onClick(View v) {
-				saveMapInGridView();
-				ChooseMapFragment chooseMapFragment = new ChooseMapFragment();       
+				//saveMapInGridView();
+				
+				ChooseMapFragment chooseMapFragment = new ChooseMapFragment(); 
+				Bundle bundle = new Bundle();
+				bundle.putString("typeofgame", "demo");
+				chooseMapFragment.setArguments(bundle);
 		        getFragmentManager().beginTransaction()
 		                .replace(R.id.mainfragment, chooseMapFragment)
 		                .addToBackStack("connection")
@@ -346,6 +351,53 @@ public class GameFragment extends Fragment{
 		if(item.getItemId() == R.id.savemap)
 		{
 			saveMapInGridView();
+			Toast.makeText(getActivity(),"Carte mise à jour", Toast.LENGTH_SHORT).show();
+		}
+		else if(item.getItemId() == R.id.addmap)
+		{
+			Builder builder = new Builder(getActivity());
+	        final EditText input = new EditText(getActivity());
+	        builder
+	            .setTitle("Saisissez votre titre")					            
+	            .setView(input)	          
+	            .setPositiveButton("Ok", new DialogInterface.OnClickListener() 
+	            {
+	                public void onClick(DialogInterface dialog, int which) 
+	                {
+	                	String value = input.getText().toString();
+	                    if (value.trim().length() == 0) 
+	                    {
+	                        Toast.makeText(getActivity(),"Titre non saisi", Toast.LENGTH_SHORT).show();
+	                    } 
+	                    else 
+	                    {
+	                    	
+	                    	if(db.CheckTitleMap(value))
+	                    	{
+	                    		 Toast.makeText(getActivity(),"Titre déjà utilisé", Toast.LENGTH_SHORT).show();
+	                    	}
+	                    	else
+	                    	{
+	                    		Bitmap bm = gridview.getDrawingCache();
+		            			if(bm != null)
+		            			{
+		            			db.insertMapInDB(mapSelect, Utility.getBytes(bm), value);
+		            			}
+	                    	}	                    	
+	                    }
+	                }					               
+	            })
+	        	.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+
+	            public void onClick(DialogInterface dialog, int which) {
+	                InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+	                imm.hideSoftInputFromWindow(input.getWindowToken(), 0);
+	            }
+
+	        });
+
+	        builder.show();
+			
 		}
 		return false;
 	}
@@ -581,6 +633,8 @@ public class GameFragment extends Fragment{
 		return moveSequence;
 		
 	}
+	
+	
 	/**
 	 * Check move is valid
 	 * @param moveSequence
@@ -681,4 +735,6 @@ public class GameFragment extends Fragment{
 		
 		return _curDirection;
 	}
+	
+	
 }

@@ -349,34 +349,6 @@
             android:layout_centerHorizontal="true"
             android:text="Choose map" />
 
-        <LinearLayout
-            android:id="@+id/LinearLayout20"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignLeft="@+id/choosemap"
-            android:layout_alignRight="@+id/choosemap"
-            android:layout_below="@+id/choosemap"
-            android:layout_marginTop="49dp"
-            android:gravity="center_vertical"
-            android:orientation="horizontal" >
-
-            <ImageButton
-                android:id="@+id/imageButtonColor"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginRight="20dp"
-                android:layout_marginTop="8dp"
-                android:background="@drawable/icon_color" />
-
-            <ImageView
-                android:id="@+id/imageView17"
-                android:layout_width="64dp"
-                android:layout_height="64dp"
-                android:layout_gravity="center_vertical"
-                android:src="@drawable/no_color" />
-
-        </LinearLayout>
-
      <!--    <TextView
             android:id="@+id/notice"
             android:layout_width="wrap_content"
@@ -406,16 +378,43 @@
             android:layout_marginTop="27dp"
             android:gravity="center_horizontal"
             android:text="@string/choose_color"
-            android:textSize="16dp" />
+            android:textSize="@dimen/tuto_text" />
 
         <ImageButton
             android:id="@+id/helpButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignLeft="@+id/textView5"
-            android:layout_below="@+id/LinearLayout20"
-            android:layout_marginTop="116dp"
+            android:layout_alignLeft="@+id/startbutton"
+            android:layout_below="@+id/textView5"
+            android:layout_marginTop="26dp"
             android:background="@drawable/question_sign" />
+
+        <LinearLayout
+            android:id="@+id/LinearLayout20"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/textView4"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="28dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal" >
+
+            <ImageButton
+                android:id="@+id/imageButtonColor"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginRight="20dp"
+              android:layout_marginLeft="25dp"
+                android:background="@drawable/icon_color" />
+
+            <ImageView
+                android:id="@+id/imageView17"
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:layout_gravity="center_vertical"
+                android:src="@drawable/no_color" />
+        </LinearLayout>
 
         <TextView
             android:id="@+id/textView5"
@@ -423,8 +422,9 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/LinearLayout20"
             android:layout_centerHorizontal="true"
-            android:layout_marginTop="89dp"
-            android:text="@string/help" />
+            android:layout_marginTop="65dp"
+            android:text="@string/help"
+            android:textSize="@dimen/tuto_text" />
 
     </RelativeLayout>
 
