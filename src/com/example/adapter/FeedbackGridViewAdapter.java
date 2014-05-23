@@ -83,6 +83,7 @@ public class FeedbackGridViewAdapter extends BaseAdapter{
 			 {
 				 case Right:
 					 imageView.setRotation(0f);
+					 imageView.setBackgroundResource(R.drawable.search);
 			     break;
 					 
 				 case Left:
@@ -92,13 +93,15 @@ public class FeedbackGridViewAdapter extends BaseAdapter{
 					 
 				 case Up:
 					 imageView.setRotation(270f);
+					 imageView.setBackgroundResource(R.drawable.search);
 					 break;
 					 
 				 case Down:
 					 imageView.setRotation(90f);
-					 break;
+					 imageView.setBackgroundResource(R.drawable.search);
+					break;
 			 }
-			 imageView.setBackgroundResource(R.drawable.search);
+			 
 			 break;
 		 case End:
 			 imageView.setBackgroundResource(R.drawable.finish_flag);

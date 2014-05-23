@@ -220,7 +220,7 @@ public class FeedbackFragment extends Fragment implements IOrderCompleteListener
 			@Override
 			public void run()
 			{
-				Toast.makeText(getActivity(), "You win", Toast.LENGTH_SHORT).show();
+				Toast.makeText(getActivity(), "You win", Toast.LENGTH_LONG).show();
 			}});
 	}
 
@@ -233,7 +233,7 @@ public class FeedbackFragment extends Fragment implements IOrderCompleteListener
 			@Override
 			public void run()
 			{
-				Toast.makeText(getActivity(), "You loose", Toast.LENGTH_SHORT).show();
+				Toast.makeText(getActivity(), "You loose", Toast.LENGTH_LONG).show();
 			}});
 	}
 
